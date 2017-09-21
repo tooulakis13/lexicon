@@ -1,0 +1,42 @@
+/* MLS Lexicon Styles */
+/** GENERAL DISPLAY */
+.mls-lexicon-cont a {
+	cursor: pointer;
+}
+
+.mls-lex-center{
+	text-align:center; 
+}
+/** LISTS **/
+.mls-lexicon-cont ul {
+	list-style: none;
+  padding: 0;
+}
+
+.mls-lexicon-cont  li {
+	  display: inline-block;
+  width: 30%;
+  margin: 1%;
+  vertical-align: middle;
+}
+li.lex-li-2 {
+	width: 47%;
+}
+li.lex-li-single {
+	width: 97%;
+}
+/** FLOAT **/
+
+.mls-lex-fl {
+	float: left;
+}
+.mls-lex-fr {
+	float: right;
+}
+.mls-lext-fc {
+	clear: both;
+}
+/** MISC **/
+.mls-lex-pointer {
+	cursor: pointer;
+}

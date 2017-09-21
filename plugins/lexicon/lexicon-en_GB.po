@@ -1,0 +1,859 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Lexicon v1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2015-02-10 10:39:47+0000\n"
+"Last-Translator: patmir<miroslaw.patryk@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: CSL v1.x\n"
+"X-Poedit-Language: English\n"
+"X-Poedit-Country: UNITED KINGDOM\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-KeywordsList: __;_e;__ngettext:1,2;_n:1,2;__ngettext_noop:1,2;_n_noop:1,2;_c,_nc:4c,1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;_nx_noop:4c,1,2;\n"
+"X-Poedit-Basepath: \n"
+"X-Poedit-Bookmarks: \n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Textdomain-Support: yes"
+
+#: includes/controllers/lexicon_menu_admin_help.php:2
+#@ lexicon
+msgid "Lexicon API"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_help.php:4
+#@ lexicon
+msgid "API - Application Programming Interface. Here you will find quick guides as to how to setup and use Lexicon"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_help.php:6
+#@ lexicon
+msgid "Available Shortcodes"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_help.php:8
+#@ lexicon
+msgid "This is flexible shortcode that can be placed inside a page, post or a widget. It will initialize Lexicon."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_help.php:10
+#@ lexicon
+msgid "Adding a Course"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_help.php:12
+#@ lexicon
+msgid "Editing a Course"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_help.php:14
+#@ lexicon
+msgid "Deleting a Course"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_options.php:7
+#: includes/controllers/lexicon_menu_students_options.php:12
+#@ lexicon
+msgid "Options updated"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_options.php:12
+#@ lexicon
+msgid "Lexicon Options"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_options.php:21
+#@ lexicon
+msgid "Database"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_options.php:30
+#@ lexicon
+msgid "Remove all lexicon database entries upon uninstall (Including Courses)."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_options.php:35
+#@ lexicon
+msgid "Remove all lexicon data upon deactivation (Including Courses)."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_options.php:43
+#@ lexicon
+msgid "Save Changes"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students.php:61
+#@ lexicon
+msgid "Student"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students.php:62
+#@ lexicon
+msgid "Current course(s)"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students.php:63
+#@ lexicon
+msgid "Completed course(s)"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students.php:64
+#@ lexicon
+msgid "User type"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:14
+#: includes/controllers/lexicon_menu_admin_students_bak.php:135
+#: includes/controllers/lexicon_menu_admin_teachers.php:14
+#: includes/controllers/lexicon_menu_admin_teachers.php:132
+#@ default
+msgid "Cheatin&#8217; uh?"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:18
+#: includes/controllers/lexicon_menu_admin_teachers.php:18
+#@ default
+msgid "Users"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:21
+#: includes/controllers/lexicon_menu_admin_teachers.php:21
+#@ default
+msgctxt "users per page (screen options)"
+msgid "Users"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:26
+#: includes/controllers/lexicon_menu_admin_teachers.php:26
+#@ default
+msgid "Overview"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:27
+#: includes/controllers/lexicon_menu_admin_teachers.php:27
+#@ default
+msgid "This screen lists all the existing users for your site. Each user has one of five defined roles as set by the site admin: Site Administrator, Editor, Author, Contributor, or Subscriber. Users with roles other than Administrator will see fewer options in the dashboard navigation when they are logged in, based on their role."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:28
+#: includes/controllers/lexicon_menu_admin_teachers.php:28
+#@ default
+msgid "To add a new user for your site, click the Add New button at the top of the screen or Add New in the Users menu section."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:33
+#: includes/controllers/lexicon_menu_admin_teachers.php:33
+#@ default
+msgid "Screen Display"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:34
+#: includes/controllers/lexicon_menu_admin_teachers.php:34
+#@ default
+msgid "You can customize the display of this screen in a number of ways:"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:36
+#: includes/controllers/lexicon_menu_admin_teachers.php:36
+#@ default
+msgid "You can hide/display columns based on your needs and decide how many users to list per screen using the Screen Options tab."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:37
+#: includes/controllers/lexicon_menu_admin_teachers.php:37
+#@ default
+msgid "You can filter the list of users by User Role using the text links in the upper left to show All, Administrator, Editor, Author, Contributor, or Subscriber. The default view is to show all users. Unused User Roles are not listed."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:38
+#: includes/controllers/lexicon_menu_admin_teachers.php:38
+#@ default
+msgid "You can view all posts made by a user by clicking on the number under the Posts column."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:42
+#: includes/controllers/lexicon_menu_admin_teachers.php:42
+#@ default
+msgid "Hovering over a row in the users list will display action links that allow you to manage users. You can perform the following actions:"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:44
+#: includes/controllers/lexicon_menu_admin_teachers.php:44
+#@ default
+msgid "Edit takes you to the editable profile screen for that user. You can also reach that screen by clicking on the username."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:47
+#: includes/controllers/lexicon_menu_admin_teachers.php:47
+#@ default
+msgid "Remove allows you to remove a user from your site. It does not delete their content. You can also remove multiple users at once by using Bulk Actions."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:49
+#: includes/controllers/lexicon_menu_admin_teachers.php:49
+#@ default
+msgid "Delete brings you to the Delete Users screen for confirmation, where you can permanently remove a user from your site and delete their content. You can also delete multiple users at once by using Bulk Actions."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:55
+#: includes/controllers/lexicon_menu_admin_teachers.php:55
+#@ default
+msgid "Actions"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:61
+#: includes/controllers/lexicon_menu_admin_teachers.php:61
+#@ default
+msgid "For more information:"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:62
+#: includes/controllers/lexicon_menu_admin_teachers.php:62
+#@ default
+msgid "<a href=\"http://codex.wordpress.org/Users_Screen\" target=\"_blank\">Documentation on Managing Users</a>"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:63
+#: includes/controllers/lexicon_menu_admin_teachers.php:63
+#@ default
+msgid "<a href=\"http://codex.wordpress.org/Roles_and_Capabilities\" target=\"_blank\">Descriptions of Roles and Capabilities</a>"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:64
+#: includes/controllers/lexicon_menu_admin_teachers.php:64
+#@ default
+msgid "<a href=\"https://wordpress.org/support/\" target=\"_blank\">Support Forums</a>"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:108
+#: includes/controllers/lexicon_menu_admin_students_bak.php:125
+#: includes/controllers/lexicon_menu_admin_teachers.php:105
+#: includes/controllers/lexicon_menu_admin_teachers.php:122
+#@ default
+msgid "You can&#8217;t edit that user."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:117
+#: includes/controllers/lexicon_menu_admin_teachers.php:114
+#@ default
+msgid "You can&#8217;t give users that role."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:148
+#: includes/controllers/lexicon_menu_admin_students_bak.php:199
+#: includes/controllers/lexicon_menu_admin_teachers.php:145
+#: includes/controllers/lexicon_menu_admin_teachers.php:196
+#@ default
+msgid "User deletion is not allowed from this screen."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:167
+#: includes/controllers/lexicon_menu_admin_students_bak.php:209
+#: includes/controllers/lexicon_menu_admin_teachers.php:164
+#: includes/controllers/lexicon_menu_admin_teachers.php:206
+#@ default
+msgid "You can&#8217;t delete users."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:174
+#: includes/controllers/lexicon_menu_admin_teachers.php:171
+#@ default
+msgid "You can&#8217;t delete that user."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:225
+#: includes/controllers/lexicon_menu_admin_teachers.php:222
+#@ default
+msgid "Delete Users"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:228
+#: includes/controllers/lexicon_menu_admin_teachers.php:225
+#@ default
+msgid "ERROR:"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:228
+#: includes/controllers/lexicon_menu_admin_teachers.php:225
+#@ default
+msgid "Please select an option."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:231
+#: includes/controllers/lexicon_menu_admin_teachers.php:228
+#@ default
+msgid "You have specified this user for deletion:"
+msgid_plural "You have specified these users for deletion:"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:238
+#: includes/controllers/lexicon_menu_admin_teachers.php:235
+#, php-format
+#@ default
+msgid "ID #%1$s: %2$s <strong>The current user will not be deleted.</strong>"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:240
+#: includes/controllers/lexicon_menu_admin_students_bak.php:342
+#: includes/controllers/lexicon_menu_admin_teachers.php:237
+#: includes/controllers/lexicon_menu_admin_teachers.php:339
+#, php-format
+#@ default
+msgid "ID #%1$s: %2$s"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:247
+#: includes/controllers/lexicon_menu_admin_teachers.php:244
+#@ default
+msgid "What should be done with content owned by this user?"
+msgid_plural "What should be done with content owned by these users?"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:250
+#: includes/controllers/lexicon_menu_admin_teachers.php:247
+#@ default
+msgid "Delete all content."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:252
+#: includes/controllers/lexicon_menu_admin_teachers.php:249
+#@ default
+msgid "Attribute all content to:"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:256
+#: includes/controllers/lexicon_menu_admin_teachers.php:253
+#@ default
+msgid "Confirm Deletion"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:258
+#: includes/controllers/lexicon_menu_admin_teachers.php:255
+#@ default
+msgid "There are no valid users selected for deletion."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:270
+#: includes/controllers/lexicon_menu_admin_students_bak.php:278
+#: includes/controllers/lexicon_menu_admin_students_bak.php:307
+#: includes/controllers/lexicon_menu_admin_students_bak.php:315
+#: includes/controllers/lexicon_menu_admin_teachers.php:267
+#: includes/controllers/lexicon_menu_admin_teachers.php:275
+#: includes/controllers/lexicon_menu_admin_teachers.php:304
+#: includes/controllers/lexicon_menu_admin_teachers.php:312
+#@ default
+msgid "You can&#8217;t remove users."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:329
+#: includes/controllers/lexicon_menu_admin_teachers.php:326
+#@ default
+msgid "Remove Users from Site"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:330
+#: includes/controllers/lexicon_menu_admin_teachers.php:327
+#@ default
+msgid "You have specified these users for removal:"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:338
+#: includes/controllers/lexicon_menu_admin_teachers.php:335
+#, php-format
+#@ default
+msgid "ID #%1$s: %2$s <strong>The current user will not be removed.</strong>"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:340
+#: includes/controllers/lexicon_menu_admin_teachers.php:337
+#, php-format
+#@ default
+msgid "ID #%1$s: %2$s <strong>You don't have permission to remove this user.</strong>"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:349
+#: includes/controllers/lexicon_menu_admin_teachers.php:346
+#@ default
+msgid "Confirm Removal"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:351
+#: includes/controllers/lexicon_menu_admin_teachers.php:348
+#@ default
+msgid "There are no valid users selected for removal."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:382
+#: includes/controllers/lexicon_menu_admin_teachers.php:378
+#, php-format
+#@ default
+msgid "User deleted."
+msgid_plural "%s users deleted."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:386
+#: includes/controllers/lexicon_menu_admin_teachers.php:382
+#, php-format
+#@ default
+msgid "New user created. <a href=\"%s\">Edit user</a>"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:390
+#: includes/controllers/lexicon_menu_admin_teachers.php:386
+#@ default
+msgid "New user created."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:394
+#: includes/controllers/lexicon_menu_admin_teachers.php:390
+#@ default
+msgid "Changed roles."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:397
+#: includes/controllers/lexicon_menu_admin_teachers.php:393
+#@ default
+msgid "The current user&#8217;s role must have user editing capabilities."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:398
+#: includes/controllers/lexicon_menu_admin_teachers.php:394
+#@ default
+msgid "Other user roles have been changed."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:401
+#: includes/controllers/lexicon_menu_admin_teachers.php:397
+#@ default
+msgid "You can&#8217;t delete the current user."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:402
+#: includes/controllers/lexicon_menu_admin_teachers.php:398
+#@ default
+msgid "Other users have been deleted."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:405
+#: includes/controllers/lexicon_menu_admin_teachers.php:401
+#@ default
+msgid "User removed from this site."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:408
+#: includes/controllers/lexicon_menu_admin_teachers.php:404
+#@ default
+msgid "You can't remove the current user."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:409
+#: includes/controllers/lexicon_menu_admin_teachers.php:405
+#@ default
+msgid "Other users have been removed."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:436
+#: includes/controllers/lexicon_menu_admin_teachers.php:431
+#@ default
+msgctxt "user"
+msgid "Add New"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:438
+#: includes/controllers/lexicon_menu_admin_teachers.php:433
+#@ default
+msgctxt "user"
+msgid "Add Existing"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_students_bak.php:449
+#: includes/controllers/lexicon_menu_admin_teachers.php:444
+#@ default
+msgid "Search Users"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_admin_teachers.php:437
+#, php-format
+#@ default
+msgid "Search results for &#8220;%s&#8221;"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:133
+#@ lexicon
+msgid "Lexicon Opciones"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:135
+#@ lexicon
+msgid "Go to"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:135
+#@ lexicon
+msgid "Manage Your Exams"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:143
+#@ lexicon
+msgid "Tamaño de la letra"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:150
+#@ lexicon
+msgid "Tamaño pequeño."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:153
+#@ lexicon
+msgid "Tamaño normal."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:156
+#@ lexicon
+msgid "Tamaño grande."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:162
+#@ lexicon
+msgid "Orden de las flashcards"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:169
+#@ lexicon
+msgid "Primero el idioma base."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:172
+#@ lexicon
+msgid "Primero el idioma a aprender."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:175
+#: includes/controllers/lexicon_menu_students_options.php:194
+#@ lexicon
+msgid "Aleatorio."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:181
+#@ lexicon
+msgid "Presentación de las flashcards"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:188
+#@ lexicon
+msgid "Pulsar botones."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:191
+#@ lexicon
+msgid "Escribir respuesta y comprobar."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:200
+#@ lexicon
+msgid "Forma de realizar el curso"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:207
+#@ lexicon
+msgid "Realizar el curso por categorías."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:210
+#@ lexicon
+msgid "Realizar el curso completo."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:216
+#@ lexicon
+msgid "Estadísticas en el gráfico del curso"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:223
+#@ lexicon
+msgid "Con estadísticas."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:226
+#@ lexicon
+msgid "Sin estadísticas."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:232
+#@ lexicon
+msgid "Algoritmo de repeteción espaciada"
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:239
+#@ lexicon
+msgid "Usar el algoritmo de repectición espaciada para estudiar los cursos."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:242
+#@ lexicon
+msgid "Usar un orden fijado para estudiar el curso."
+msgstr ""
+
+#: includes/controllers/lexicon_menu_students_options.php:249
+#@ lexicon
+msgid "Guardar cambios"
+msgstr ""
+
+#: includes/lexicon_page_course.php:134
+#@ lexicon
+msgid "Course Studying"
+msgstr ""
+
+#: includes/lexicon_page_course.php:137
+#@ lexicon
+msgid "Select category"
+msgstr ""
+
+#: includes/lexicon_page_course_management.php:29
+#: includes/lexicon_page_edit_course.php:50
+#@ lexicon
+msgid "Edit Courses"
+msgstr ""
+
+#: includes/lexicon_page_course_management.php:42
+#: includes/lexicon_page_edit_course.php:63
+#@ lexicon
+msgid "Create Course"
+msgstr ""
+
+#: includes/lexicon_page_course_management.php:55
+#: includes/lexicon_page_edit_course.php:76
+#@ lexicon
+msgid "Edit Custom Courses"
+msgstr ""
+
+#: includes/lexicon_page_course_management.php:69
+#: includes/lexicon_page_edit_course.php:90
+#@ lexicon
+msgid "Create Custom Course"
+msgstr ""
+
+#: includes/lexicon_page_courses.php:7
+#@ lexicon
+msgid "Enrolled courses"
+msgstr ""
+
+#: includes/lexicon_page_courses.php:11
+#@ lexicon
+msgid "Start new course:"
+msgstr ""
+
+#: includes/lexicon_page_create_course.php:144
+#@ lexicon
+msgid "Cursos"
+msgstr ""
+
+#: includes/lexicon_page_create_course.php:154
+#@ lexicon
+msgid "Creado correctamente."
+msgstr ""
+
+#: includes/lexicon_page_create_course.php:161
+#@ lexicon
+msgid "Ya existe el curso."
+msgstr ""
+
+#: includes/lexicon_page_create_course.php:168
+#@ lexicon
+msgid "No puede haber ningun campo en blanco"
+msgstr ""
+
+#: includes/lexicon_page_create_course.php:178
+#@ lexicon
+msgid "CARGAR CSV"
+msgstr ""
+
+#: includes/lexicon_page_create_course.php:182
+#@ lexicon
+msgid "Selecciona un archivo para subir:"
+msgstr ""
+
+#: includes/lexicon_page_create_course.php:185
+#@ lexicon
+msgid "ACEPTAR"
+msgstr ""
+
+#: includes/lexicon_page_create_course.php:199
+#@ lexicon
+msgid "Base:"
+msgstr ""
+
+#: includes/lexicon_page_create_course.php:211
+#@ lexicon
+msgid "Destino:"
+msgstr ""
+
+#: includes/lexicon_page_create_course.php:221
+#@ lexicon
+msgid "Nivel:"
+msgstr ""
+
+#: includes/lexicon_page_create_course.php:225
+#@ lexicon
+msgid "Descripción:"
+msgstr ""
+
+#: includes/lexicon_page_create_course.php:231
+#@ lexicon
+msgid "Insertar una breve descripción del Curso. Máximo 255 letras."
+msgstr ""
+
+#: includes/lexicon_page_create_course.php:239
+#@ lexicon
+msgid "SELECCIONAR PALABRAS"
+msgstr ""
+
+#: includes/lexicon_page_create_course.php:241
+#@ lexicon
+msgid "AÑADIR LAS PALABRAS DE UN CURSO"
+msgstr ""
+
+#: includes/lexicon_page_create_course.php:242
+#@ lexicon
+msgid "CREAR"
+msgstr ""
+
+#: includes/lexicon_page_create_course.php:247
+#@ lexicon
+msgid "MODIFICAR CURSO"
+msgstr ""
+
+#: includes/lexicon_page_sign_up_course.php:134
+#: includes/lexicon_page_sign_up_course.php:162
+#@ lexicon
+msgid "Enroll"
+msgstr ""
+
+#: includes/lexicon_page_sign_up_course.php:139
+#@ lexicon
+msgid "Course to learn:"
+msgstr ""
+
+#: includes/lexicon_page_sign_up_course.php:141
+#@ lexicon
+msgid "Select language"
+msgstr ""
+
+#: includes/lexicon_page_sign_up_course.php:149
+#@ lexicon
+msgid "Course Language:"
+msgstr ""
+
+#: includes/lexicon_page_sign_up_course.php:156
+#@ lexicon
+msgid "Level:"
+msgstr ""
+
+#: includes/lexicon_page_study_course.php:182
+#@ lexicon
+msgid "Right"
+msgstr ""
+
+#: includes/lexicon_page_study_course.php:187
+#@ lexicon
+msgid "Wrong"
+msgstr ""
+
+#: includes/lexicon_page_study_course.php:246
+#: includes/lexicon_page_study_course.php:247
+#: includes/lexicon_page_study_course.php:248
+#: includes/lexicon_page_study_course.php:249
+#: includes/lexicon_page_study_course.php:250
+#: includes/lexicon_page_study_course.php:254
+#: includes/lexicon_page_study_course.php:255
+#: includes/lexicon_page_study_course.php:256
+#: includes/lexicon_page_study_course.php:257
+#: includes/lexicon_page_study_course.php:258
+#@ lexicon
+msgid "Box"
+msgstr ""
+
+#: includes/lexicon_page_study_course.php:271
+#@ lexicon
+msgid "Study category"
+msgstr ""
+
+#: includes/lexicon_page_study_course.php:273
+#@ lexicon
+msgid "Position"
+msgstr ""
+
+#: includes/lexicon_page_study_course.php:278
+#: includes/lexicon_page_study_course.php:283
+#@ lexicon
+msgid "Return"
+msgstr ""
+
+#: includes/lexicon_page_study_course.php:328
+#@ lexicon
+msgid "Show answer"
+msgstr ""
+
+#: includes/lexicon_page_study_course.php:331
+#: includes/lexicon_page_study_course.php:351
+#@ lexicon
+msgid "?????"
+msgstr ""
+
+#: includes/lexicon_page_study_course.php:363
+#@ lexicon
+msgid "Check result"
+msgstr ""
+
+#: includes/lexicon_page_study_course.php:371
+#@ lexicon
+msgid "Check answer"
+msgstr ""
+
+#: includes/lexicon_page_study_course.php:382
+#@ lexicon
+msgid "I know"
+msgstr ""
+
+#: includes/lexicon_page_study_course.php:383
+#@ lexicon
+msgid "Skip"
+msgstr ""
+
+#: includes/lexicon_page_study_course.php:384
+#@ lexicon
+msgid "I don not know"
+msgstr ""
+
+#: includes/lexicon_page_study_course.php:393
+#@ lexicon
+msgid "Repeat"
+msgstr ""
+
+#: lexicon.php:603
+#@ lexicon
+msgid "You need to be registered and logged in to see this."
+msgstr ""
+
+#: lexicon.php:604
+#@ lexicon
+msgid "Log in"
+msgstr ""
+
+#: lexicon.php:640
+#@ lexicon
+msgid "Enroll or continue course"
+msgstr ""
+
+#: lexicon.php:665
+#@ lexicon
+msgid "Manage Courses"
+msgstr ""
+
