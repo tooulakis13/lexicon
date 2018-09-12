@@ -5,10 +5,21 @@
   Version: 1.0
  */
 
+global $wpdb;
+
 // Location variables
 define('LEXICON_DIR', dirname(__FILE__));
 define('LEXICON_DIR_RELATIVO', dirname(plugin_basename(__FILE__)));
 define('LEXICON_URL', plugin_dir_url(__FILE__));
+
+define('_LEXICON_COURSE', $wpdb->prefix . 'lexicon_course');
+define('_LEXICON_COURSE_STUDENT', $wpdb->prefix . 'lexicon_course_student');
+define('_LEXICON_COURSE_SUTDENT_CARD', $wpdb->prefix . 'lexicon_course_student_card');
+define('_LEXICON_COURSE_AUTHOR', $wpdb->prefix . 'lexicon_course_author');
+define('_LEXICON_COURSE_CODES', $wpdb->prefix . 'lexicon_course_codes');
+define('_LEXICON_WORDS', $wpdb->prefix . 'lexicon_words');
+define('_LEXICON_WORD_CODE', $wpdb->prefix . 'lexicon_word_code');
+define('_LEXICON_WORD_DETAILS', $wpdb->prefix . 'lexicon_word_details');
 
 //Links to necessary files
 require_once(LEXICON_DIR . '/includes/lexicon_functions.php');
@@ -80,7 +91,7 @@ class Lexicon_words_List extends WP_List_Table {
     }
 
     public function lexicon_load($dir, $type) {
-        echo '<script type="text/javascript">alert("In lexicon load function")</script>';
+        //echo '<script type="text/javascript">alert("In lexicon load function")</script>';
         $directory = opendir($dir);
         while ($archive = readdir($directory)) {
             if ($archive != '.' && $archive != '..') {
@@ -100,8 +111,9 @@ class Lexicon_words_List extends WP_List_Table {
     }
 
     public function lexicon_load_lang($dir, $lang_name) {
-        echo '<script type="text/javascript">alert("In lexicon load lang function")</script>';
         global $wpdb;
+        //echo '<script type="text/javascript">alert("In lexicon load lang function")</script>';
+        //define('_LEXICON_WORDS', $wpdb->prefix . 'lexicon_words');
         $absolutepath = $dir . '/' . $lang_name;
         $lang = strstr($lang_name, '-', true);
         $lang_name = strstr($lang_name, '-');
@@ -445,10 +457,10 @@ class Lexicon_words_List extends WP_List_Table {
                 <?php
                 $importLangCSV_nonce = wp_create_nonce('sp_import_lexicon_lang_CSV');
                 ?>
-                <a class="button-primary" href="?page=<?php echo esc_attr($_REQUEST['page']) ?>&action=importLangCSV&_wpnonce=<?php echo $importLangCSV_nonce ?>">Import Language File</a>
+                <a class="button-primary" href="?page=<?php echo esc_attr($_REQUEST['page']) ?>&action=importLangCSV&_wpnonce=<?php echo $importLangCSV_nonce ?>">Import</a>
 
                         <!-- <input type="button" id="loadCsvId" onclick="loadCsv()" class="button-primary" value="Import Language File"> -->
-                <input type="button" id="exportCsvId" onclick="exportCsv()" class="button-primary" value="Export CSV">
+                <input type="button" id="exportCsvId" onclick="exportCsv()" class="button-primary" value="Export">
             </div>
             <br class="clear" />
             <?php if ($this->has_items()): ?>
@@ -494,7 +506,7 @@ class Lexicon_words_List extends WP_List_Table {
                 // esc_url_raw() is used to prevent converting ampersand in url to "#038;"
                 // add_query_arg() return the current url
                 //$origUrl = esc_attr($_REQUEST['page']);
-                //wp_redirect(esc_url_raw(add_query_arg(array('page' => 'lexicon_testing'), admin_url('admin.php'))));
+                wp_redirect(esc_url_raw(add_query_arg(array('page' => 'lexicon_testing'), admin_url('admin.php'))));
                 exit;
             }
         }
@@ -583,14 +595,14 @@ class SP_Plugin {
         //$GLOBALS['_LEXICON_WORDS'] = $wpdb->prefix . 'lexicon_words';
         //$GLOBALS['_LEXICON_WORD_CODE'] = $wpdb->prefix . 'lexicon_word_code';
         //$GLOBALS['_LEXICON_WORD_DETAILS'] = $wpdb->prefix . 'lexicon_word_details';
-        define('_LEXICON_COURSE', $wpdb->prefix . 'lexicon_course');
-        define('_LEXICON_COURSE_STUDENT', $wpdb->prefix . 'lexicon_course_student');
-        define('_LEXICON_COURSE_SUTDENT_CARD', $wpdb->prefix . 'lexicon_course_student_card');
-        define('_LEXICON_COURSE_AUTHOR', $wpdb->prefix . 'lexicon_course_author');
-        define('_LEXICON_COURSE_CODES', $wpdb->prefix . 'lexicon_course_codes');
-        define('_LEXICON_WORDS', $wpdb->prefix . 'lexicon_words');
-        define('_LEXICON_WORD_CODE', $wpdb->prefix . 'lexicon_word_code');
-        define('_LEXICON_WORD_DETAILS', $wpdb->prefix . 'lexicon_word_details');
+        //define('_LEXICON_COURSE', $wpdb->prefix . 'lexicon_course');
+        //define('_LEXICON_COURSE_STUDENT', $wpdb->prefix . 'lexicon_course_student');
+        //define('_LEXICON_COURSE_SUTDENT_CARD', $wpdb->prefix . 'lexicon_course_student_card');
+        //define('_LEXICON_COURSE_AUTHOR', $wpdb->prefix . 'lexicon_course_author');
+        //define('_LEXICON_COURSE_CODES', $wpdb->prefix . 'lexicon_course_codes');
+        //define('_LEXICON_WORDS', $wpdb->prefix . 'lexicon_words');
+        //define('_LEXICON_WORD_CODE', $wpdb->prefix . 'lexicon_word_code');
+        //define('_LEXICON_WORD_DETAILS', $wpdb->prefix . 'lexicon_word_details');
         // Check for existing DB
         if (get_option("lexicon_db_version") == "") {
             //No db found
@@ -886,6 +898,9 @@ class SP_Plugin {
                             </form>
                         </div>
                         <div id="lexicon-add-word">
+                            <input type="button" onclick="backToLexicon()" class="button-secondary" value="Cancel"/>
+                        </div>
+                        <div id="lexicon-import-file">
                             <input type="button" onclick="backToLexicon()" class="button-secondary" value="Cancel"/>
                         </div>
                     </div>
