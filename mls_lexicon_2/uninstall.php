@@ -5,7 +5,7 @@
   Description: Eliminación del plugin lexicon.
 */
 
-if(defined('WP_UNINSTALL_PLUGIN') or defined('LEXICON_PSEUDO_UNINSTALL')) {
+if(defined('WP_UNINSTALL_PLUGIN') or defined('TESTINGV1_PSEUDO_UNINSTALL')) {
   
 } else {
 	exit();
@@ -13,7 +13,7 @@ if(defined('WP_UNINSTALL_PLUGIN') or defined('LEXICON_PSEUDO_UNINSTALL')) {
 global $wpdb;
 
 //  If clean lexicon data is selected in admin panel, clear DB
-if(get_option('lexicon_cleanup_db') == 1)
+if(get_option('testingv1_cleanup_db') == 1)
 {
   // Tables to be removed
   $wpdb->query("SET FOREIGN_KEY_CHECKS=0;");
@@ -76,7 +76,7 @@ if(get_option('lexicon_cleanup_db') == 1)
     
         // Remove the capability.
 		
-        $r->remove_cap( $cap );
+        //$r->remove_cap( $cap );
 		 }
     }
 	
