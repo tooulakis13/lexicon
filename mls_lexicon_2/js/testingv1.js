@@ -105,27 +105,76 @@ function cancelMods(theId) {
 
 window.onload = function () {
     //var classToAppendButtons = document.getElementById("custom_alignleft_bulkactions_lexicon").innerHTML;
-    
+
     //classToAppendButtons += '<input type="button" id="addWordId" onclick="addWord()" class="button-primary" value="Add Word">'
     //    + '    <input type="button" id="loadCsvId" onclick="loadCsv()" class="button-primary" value="Import Language File">'
     //   + '    <input type="button" id="exportCsvId" onclick="exportCsv()" class="button-primary" value="Export CSV">';
-    
-    
+
+
     //document.getElementById("custom_alignleft_bulkactions_lexicon").innerHTML = classToAppendButtons;
-    
+
     document.getElementById("lexicon-add-word").style.display = "none";
+    document.getElementById("lexicon-import-file").style.display = "none";
 }
 
 function addWord() {
     document.getElementById("lexicon-table-content").style.display = "none";
     document.getElementById("lexicon-add-word").style.display = "block";
+    document.getElementById("lexicon-import-file").style.display = "none";
 }
 
 function backToLexicon() {
     document.getElementById("lexicon-table-content").style.display = "block";
     document.getElementById("lexicon-add-word").style.display = "none";
+    document.getElementById("lexicon-import-file").style.display = "none";
 }
 
-/*function loadCsv() {
-    
-}*/
+function import_lexicon_lang_CSV() {
+    document.getElementById("lexicon-table-content").style.display = "none";
+    document.getElementById("lexicon-import-file").style.display = "block";
+    document.getElementById("lexicon-add-word").style.display = "none";
+}
+
+/* jQuery(document).ready(function () {
+    jQuery('#lexicon-form-full').submit(function (e) {
+        e.preventDefault();
+        // Variables
+        var files = jQuery("#lexicon_file_to_upload")[0].files;
+        var nonce = jQuery("#admin_data_import").val();
+        var sendingPage = jQuery("#sendingPage").val();
+        var ajaxurl = jQuery("#varAjUrl").val();
+        var files_data = new FormData();
+        files_data.append('action', 'importLangCSV');
+        files_data.append('act', 'sp_import_lexicon_lang_CSV');
+        files_data.append('nonce', nonce);
+        alert("Read everything");
+        jQuery.each(files, function (key, value)
+        {
+            files_data.append(key, value);
+        });
+
+        jQuery.ajax({
+            type: 'POST',
+            dataType: "json",
+            url: ajaxurl,
+            data: files_data,
+            cache: false,
+            processData: false, // Don't process the files
+            contentType: false, // Set content type to false as jQuery will tell the server its a query string request
+            success: function (response) {
+                if (response.type === 'success') {
+                    window.location = '?page=' + sendingPage + '&action=importLangCSV&_wpnonce=' + nonce;
+                } else {
+                    var err_msg = response.msg;
+                    alert(err_msg);
+
+                }
+            }
+        });
+
+    });
+
+    function progress(e) {
+        alert("Hey");
+    }
+}); */
