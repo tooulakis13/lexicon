@@ -78,20 +78,21 @@ class Lexicon_words_List extends WP_List_Table {
      *
      * @param int $id customer ID
      */
-    public static function import_lexicon_lang_CSV() {
-        //define('LEXICON_DIR', dirname(__FILE__));
-        //define('LEXICON_DIR_RELATIVO', dirname(plugin_basename(__FILE__)));
-        //define('LEXICON_URL', plugin_dir_url(__FILE__));
-//Para cada fichero en el directorio /idioms
-        //$dir = str_replace("\\", "/", LEXICON_DIR) . '/lexicon_languages';
-        //lexicon_load($dir, 'lang');
-//Para cada fichero en el directorio /courses
-//$dir = str_replace("\\", "/", LEXICON_DIR) . '/lexicon_courses';
-//$this->lexicon_load($dir, 'course');
-    }
+    /* public static function import_lexicon_lang_CSV() {
+      //define('LEXICON_DIR', dirname(__FILE__));
+      //define('LEXICON_DIR_RELATIVO', dirname(plugin_basename(__FILE__)));
+      //define('LEXICON_URL', plugin_dir_url(__FILE__));
+      //Para cada fichero en el directorio /idioms
+      //$dir = str_replace("\\", "/", LEXICON_DIR) . '/lexicon_languages';
+      //lexicon_load($dir, 'lang');
+      //Para cada fichero en el directorio /courses
+      //$dir = str_replace("\\", "/", LEXICON_DIR) . '/lexicon_courses';
+      //$this->lexicon_load($dir, 'course');
+      } */
 
     public function lexicon_load($dir, $type) {
         //echo '<script type="text/javascript">alert("In lexicon load function")</script>';
+
         $directory = opendir($dir);
         while ($archive = readdir($directory)) {
             if ($archive != '.' && $archive != '..') {
@@ -454,12 +455,8 @@ class Lexicon_words_List extends WP_List_Table {
             <div id="custom_alignleft_bulkactions_lexicon">
                 <input type="button" id="addWordId" onclick="addWord()" class="button-primary" value="Add Word">
                 <!-- <a href="#" class="button-primary">Import Language File</a> -->
-                <?php
-                $importLangCSV_nonce = wp_create_nonce('sp_import_lexicon_lang_CSV');
-                ?>
-                <a class="button-primary" href="?page=<?php echo esc_attr($_REQUEST['page']) ?>&action=importLangCSV&_wpnonce=<?php echo $importLangCSV_nonce ?>">Import</a>
-
-                        <!-- <input type="button" id="loadCsvId" onclick="loadCsv()" class="button-primary" value="Import Language File"> -->
+                <input type="button" id="importLexiconLangCSV" onclick="import_lexicon_lang_CSV()" class="button-primary" value="Import">
+                <!-- <input type="button" id="loadCsvId" onclick="loadCsv()" class="button-primary" value="Import Language File"> -->
                 <input type="button" id="exportCsvId" onclick="exportCsv()" class="button-primary" value="Export">
             </div>
             <br class="clear" />
@@ -506,7 +503,7 @@ class Lexicon_words_List extends WP_List_Table {
                 // esc_url_raw() is used to prevent converting ampersand in url to "#038;"
                 // add_query_arg() return the current url
                 //$origUrl = esc_attr($_REQUEST['page']);
-                wp_redirect(esc_url_raw(add_query_arg(array('page' => 'lexicon_testing'), admin_url('admin.php'))));
+                //wp_redirect(esc_url_raw(add_query_arg(array('page' => 'lexicon_testing'), admin_url('admin.php'))));
                 exit;
             }
         }
@@ -587,6 +584,11 @@ class SP_Plugin {
 
         global $wpdb;
         $lexicon_db_version = "1.1";
+
+        define("LEXICON_TEMP_CSV_FILES", LEXICON_DIR . '/temp_csv_files');
+
+        mkdir(LEXICON_TEMP_CSV_FILES);
+
         //$GLOBALS['_LEXICON_COURSE'] = $wpdb->prefix . 'lexicon_course';
         //$GLOBALS['_LEXICON_COURSE_STUDENT'] = $wpdb->prefix . 'lexicon_course_student';
         //$GLOBALS['_LEXICON_COURSE_SUTDENT_CARD'] = $wpdb->prefix . 'lexicon_course_student_card';
@@ -889,19 +891,24 @@ class SP_Plugin {
             <div id="poststuff">
                 <div id="post-body" class="metabox-holder columns-3">
                     <div id="post-body-content">
-                        <div id="lexicon-table-content" class="meta-box-sortables ui-sortable">
-                            <form method="post">
-                                <?php
-                                $this->lexicon_words_obj->prepare_items();
-                                $this->lexicon_words_obj->display();
-                                ?>
+                        <div id="lexicon-table-content-main" class="meta-box-sortables ui-sortable">
+                            <form method="post" enctype="multipart/form-data" id="lexicon-form-full">
+                                <div id="lexicon-table-content">
+                                    <?php
+                                    $this->lexicon_words_obj->prepare_items();
+                                    $this->lexicon_words_obj->display();
+                                    ?>
+                                </div>
                             </form>
-                        </div>
-                        <div id="lexicon-add-word">
-                            <input type="button" onclick="backToLexicon()" class="button-secondary" value="Cancel"/>
-                        </div>
-                        <div id="lexicon-import-file">
-                            <input type="button" onclick="backToLexicon()" class="button-secondary" value="Cancel"/>
+                            <div id="lexicon-add-word">
+                                <input type="button" onclick="backToLexicon()" class="button-secondary" value="Cancel"/>
+                            </div>
+                            <div id="lexicon-import-file">
+                                <form method="post" enctype="multipart/form-data" action="">
+                                    <?php include_once('importFile.php'); ?>
+                                </form>
+                            </div>
+
                         </div>
                     </div>
                 </div>
