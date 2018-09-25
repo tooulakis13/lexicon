@@ -7,10 +7,14 @@
 
 global $wpdb;
 
+$uploads = wp_upload_dir();
+
 // Location variables
 define('LEXICON_DIR', dirname(__FILE__));
+define('LEXICON_UPLOAD_DIR_NAME', wp_basename($uploads['baseurl']));
 define('LEXICON_DIR_RELATIVO', dirname(plugin_basename(__FILE__)));
 define('LEXICON_URL', plugin_dir_url(__FILE__));
+define('LEXICON_UPLOAD_DIR', str_replace('plugins\testingv1', '', LEXICON_DIR));
 
 define('_LEXICON_COURSE', $wpdb->prefix . 'lexicon_course');
 define('_LEXICON_COURSE_STUDENT', $wpdb->prefix . 'lexicon_course_student');
@@ -78,82 +82,6 @@ class Lexicon_words_List extends WP_List_Table {
      *
      * @param int $id customer ID
      */
-    /* public static function import_lexicon_lang_CSV() {
-      //define('LEXICON_DIR', dirname(__FILE__));
-      //define('LEXICON_DIR_RELATIVO', dirname(plugin_basename(__FILE__)));
-      //define('LEXICON_URL', plugin_dir_url(__FILE__));
-      //Para cada fichero en el directorio /idioms
-      //$dir = str_replace("\\", "/", LEXICON_DIR) . '/lexicon_languages';
-      //lexicon_load($dir, 'lang');
-      //Para cada fichero en el directorio /courses
-      //$dir = str_replace("\\", "/", LEXICON_DIR) . '/lexicon_courses';
-      //$this->lexicon_load($dir, 'course');
-      } */
-
-    public function lexicon_load($dir, $type) {
-        //echo '<script type="text/javascript">alert("In lexicon load function")</script>';
-
-        $directory = opendir($dir);
-        while ($archive = readdir($directory)) {
-            if ($archive != '.' && $archive != '..') {
-                switch ($type) {
-                    case 'lang':
-                        $x = $this->lexicon_load_lang($dir, $archive);
-                        break;
-                    case 'course':
-                        $x = $this->lexicon_load_course($dir, $archive);
-                        break;
-                    default:
-                }
-            }
-        }
-        closedir($directory);
-        echo "Done";
-    }
-
-    public function lexicon_load_lang($dir, $lang_name) {
-        global $wpdb;
-        //echo '<script type="text/javascript">alert("In lexicon load lang function")</script>';
-        //define('_LEXICON_WORDS', $wpdb->prefix . 'lexicon_words');
-        $absolutepath = $dir . '/' . $lang_name;
-        $lang = strstr($lang_name, '-', true);
-        $lang_name = strstr($lang_name, '-');
-        $lang_name = substr($lang_name, 1);
-        $level = strstr($lang_name, '.', true);
-        $sqlsTemp = "";
-        //$sqls = array();
-        //load file
-        $data = file($absolutepath);
-        $isFirst = true;
-        foreach ($data as $line) {
-            //Remove last CVC comma & new line
-            $lineTemp = rtrim($line);
-            $lineTempNew = rtrim($lineTemp, ",");
-            if ($isFirst) {
-                $isFirst = false;
-                continue;
-            }
-            $entry_data = explode(';', $lineTempNew);
-            $sqlsTemp .= 'INSERT INTO ' . _LEXICON_WORDS . '(code, text, phrase, context, level, column_6, column_7, column_8, column_9, column_10, column_11, lang) values ("' . $entry_data[0] . '" , "' . $entry_data[1] . '" , "' . $entry_data[2] . '" , "' . $entry_data[3] . '", "' . $level . '" , "' . $entry_data[4] . '" , "' . $entry_data[5] . '" , "' . $entry_data[6] . '" , "' . $entry_data[7] . '" , "' . $entry_data[8] . '" , "' . $entry_data[9] . '" , "' . $lang . '");';
-        }
-
-        $sqls = explode(';', $sqlsTemp);
-        $error = false;
-        $wpdb->query('START TRANSACTION');
-        foreach ($sqls as $sqlQuery) {
-            if (!$wpdb->query($sqlQuery)) {
-                $error = true;
-                break;
-            }
-            if ($error) {
-                $wpdb->query('ROLLBACK');
-            } else {
-                $wpdb->query('COMMIT');
-            }
-        }
-        return true;
-    }
-
     public function lexicon_load_course($dir, $course_name) {
         global $wpdb;
         $absolutepath = $dir . '/' . $course_name;
@@ -309,26 +237,6 @@ class Lexicon_words_List extends WP_List_Table {
         echo '<tr id="row-' . absint($item['id']) . '">';
         $this->single_row_columns($item);
         echo '</tr>';
-        /* ----------------------------------------------------------------------------- */
-        /*
-          echo '<tr id="row-' . absint($item['id']) . '-edit" style="display: none;">';
-          echo '<td colspan="3">'
-          . '<b>Word Code: ' . $item['code'] . '</b><br><br>'
-          . 'Text: ' . '<input type="text" value="' . $item['text'] . '"/> <br><br>'
-          . 'Phrase: ' . '<input type="text" value="' . $item['phrase'] . '"/> <br><br>'
-          . 'Level: ' . '<input type="text" value="' . $item['level'] . '"/> <br><br>'
-          . '<input class="button-secondary" type="button" id="' . absint($item['id']) . '" value="Cancel" onclick="cancelMods(this.id)" />'
-          . '   <input class="button-primary" type="button" id="' . absint($item['id']) . '" value="Update" onclick="applyMods(this.id)" />'
-          . '</td>';
-          echo '<td colspan="2">'
-          . 'Word Code: ' . $item['code'] . '<br><br>'
-          . 'Text: ' . '<input type="text" value="' . $item['text'] . '"/> <br><br>'
-          . '</td>';
-          echo '<td colspan="2">'
-          . 'Word Code: ' . $item['code'] . '<br><br>'
-          . 'Text: ' . '<input type="text" value="' . $item['text'] . '"/> <br><br>'
-          . '</td>';
-          echo '</tr>'; */
     }
 
     protected function single_row_columns($item) {
@@ -454,9 +362,7 @@ class Lexicon_words_List extends WP_List_Table {
 
             <div id="custom_alignleft_bulkactions_lexicon">
                 <input type="button" id="addWordId" onclick="addWord()" class="button-primary" value="Add Word">
-                <!-- <a href="#" class="button-primary">Import Language File</a> -->
                 <input type="button" id="importLexiconLangCSV" onclick="import_lexicon_lang_CSV()" class="button-primary" value="Import">
-                <!-- <input type="button" id="loadCsvId" onclick="loadCsv()" class="button-primary" value="Import Language File"> -->
                 <input type="button" id="exportCsvId" onclick="exportCsv()" class="button-primary" value="Export">
             </div>
             <br class="clear" />
@@ -488,22 +394,6 @@ class Lexicon_words_List extends WP_List_Table {
                 // add_query_arg() return the current url
                 //$origUrl = esc_attr($_REQUEST['page']);
                 wp_redirect(esc_url_raw(add_query_arg(array('page' => 'lexicon_testing'), admin_url('admin.php'))));
-                exit;
-            }
-        }
-        if ('importLangCSV' === $this->current_action()) {
-            // In our file that handles the request, verify the nonce.
-            $nonce = esc_attr($_REQUEST['_wpnonce']);
-            if (!wp_verify_nonce($nonce, 'sp_import_lexicon_lang_CSV')) {
-                die('Fatal Error');
-            } else {
-                $dir = str_replace("\\", "/", LEXICON_DIR) . '/lexicon_languages';
-                self::lexicon_load($dir, 'lang');
-                //self::import_lexicon_lang_CSV();
-                // esc_url_raw() is used to prevent converting ampersand in url to "#038;"
-                // add_query_arg() return the current url
-                //$origUrl = esc_attr($_REQUEST['page']);
-                //wp_redirect(esc_url_raw(add_query_arg(array('page' => 'lexicon_testing'), admin_url('admin.php'))));
                 exit;
             }
         }
@@ -577,300 +467,7 @@ class SP_Plugin {
     }
 
     function testingv1_install() {
-
-        /*         * ***************************************
-         * *		Database installation
-         * *************************************** */
-
-        global $wpdb;
-        $lexicon_db_version = "1.1";
-
-        define("LEXICON_TEMP_CSV_FILES", LEXICON_DIR . '/temp_csv_files');
-
-        mkdir(LEXICON_TEMP_CSV_FILES);
-
-        //$GLOBALS['_LEXICON_COURSE'] = $wpdb->prefix . 'lexicon_course';
-        //$GLOBALS['_LEXICON_COURSE_STUDENT'] = $wpdb->prefix . 'lexicon_course_student';
-        //$GLOBALS['_LEXICON_COURSE_SUTDENT_CARD'] = $wpdb->prefix . 'lexicon_course_student_card';
-        //$GLOBALS['_LEXICON_COURSE_AUTHOR'] = $wpdb->prefix . 'lexicon_course_author';
-        //$GLOBALS['_LEXICON_COURSE_CODES'] = $wpdb->prefix . 'lexicon_course_codes';
-        //$GLOBALS['_LEXICON_WORDS'] = $wpdb->prefix . 'lexicon_words';
-        //$GLOBALS['_LEXICON_WORD_CODE'] = $wpdb->prefix . 'lexicon_word_code';
-        //$GLOBALS['_LEXICON_WORD_DETAILS'] = $wpdb->prefix . 'lexicon_word_details';
-        //define('_LEXICON_COURSE', $wpdb->prefix . 'lexicon_course');
-        //define('_LEXICON_COURSE_STUDENT', $wpdb->prefix . 'lexicon_course_student');
-        //define('_LEXICON_COURSE_SUTDENT_CARD', $wpdb->prefix . 'lexicon_course_student_card');
-        //define('_LEXICON_COURSE_AUTHOR', $wpdb->prefix . 'lexicon_course_author');
-        //define('_LEXICON_COURSE_CODES', $wpdb->prefix . 'lexicon_course_codes');
-        //define('_LEXICON_WORDS', $wpdb->prefix . 'lexicon_words');
-        //define('_LEXICON_WORD_CODE', $wpdb->prefix . 'lexicon_word_code');
-        //define('_LEXICON_WORD_DETAILS', $wpdb->prefix . 'lexicon_word_details');
-        // Check for existing DB
-        if (get_option("lexicon_db_version") == "") {
-            //No db found
-
-            /*
-             * 	DB Tables SQL
-             */
-            $sqls = Array();
-            // lexicon_course
-            $sqls[] = "CREATE TABLE `" . _LEXICON_COURSE . "`(
-					`id` int unsigned NOT NULL auto_increment PRIMARY KEY,
-					`lang_1` varchar(30) NOT NULL DEFAULT '',
-					`lang_2` varchar(30) NOT NULL DEFAULT '',		
-					`level` varchar(10) NOT NULL DEFAULT '',
-					`description` varchar(255)							
-					) DEFAULT CHARSET=utf8; ";
-            // lexicon_course_student
-            $sqls[] = "CREATE TABLE `" . _LEXICON_COURSE_STUDENT . "`(
-					`student_id` bigint(20) NOT NULL DEFAULT 0,
-					`course_id` int unsigned NOT NULL DEFAULT 0,
-					`state` int unsigned NOT NULL DEFAULT 0,
-                                        PRIMARY KEY (student_id, course_id),
-					CONSTRAINT `COURSE_STUDENT_FK01` FOREIGN KEY (course_id) REFERENCES " . _LEXICON_COURSE . " (id)
-                                        ON DELETE CASCADE
-                                        ON UPDATE CASCADE	
-					) DEFAULT CHARSET=utf8; ";
-            // lexicon_course_student_card
-            $sqls[] = "CREATE TABLE `" . _LEXICON_COURSE_SUTDENT_CARD . "`(
-					`student_id` bigint(20) NOT NULL DEFAULT 0,
-					`course_id` int unsigned NOT NULL DEFAULT 0,
-					`code` varchar(16) NOT NULL DEFAULT '',
-					`prog_level` int unsigned NOT NULL DEFAULT 0,
-					CONSTRAINT `COURSE_STUDENT_CARD_FK01` FOREIGN KEY (student_id) REFERENCES " . _LEXICON_COURSE_STUDENT . " (student_id)
-                                        ON DELETE CASCADE
-                                        ON UPDATE CASCADE,
-					CONSTRAINT `COURSE_STUDENT_CARD_FK02` FOREIGN KEY (course_id) REFERENCES " . _LEXICON_COURSE . " (id)
-                                        ON DELETE CASCADE
-                                        ON UPDATE CASCADE			
-					) DEFAULT CHARSET=utf8; ";
-            // lexicon_course_author
-            $sqls[] = "CREATE TABLE `" . _LEXICON_COURSE_AUTHOR . "`(
-					`teacher_id` bigint(20) NOT NULL DEFAULT 0,
-					`course_id` int unsigned NOT NULL DEFAULT 0,									
-					PRIMARY KEY (teacher_id, course_id)					
-					) DEFAULT CHARSET=utf8; ";
-            // lexicon_course_codes
-            $sqls[] = "CREATE TABLE `" . _LEXICON_COURSE_CODES . "`(
-					`course_id` int unsigned NOT NULL DEFAULT 0,
-					`code` varchar(16) NOT NULL DEFAULT '',
-                                        `context` varchar(120),
-					PRIMARY KEY (course_id, code)			
-					) DEFAULT CHARSET=utf8; ";
-            // lexicon_words
-            $sqls[] = "CREATE TABLE `" . _LEXICON_WORDS . "`(
-                                `id` int unsigned NOT NULL auto_increment PRIMARY KEY,
-                                `code` varchar(16) NOT NULL DEFAULT '',
-                                `text` varchar(30) NOT NULL DEFAULT '',
-                                `phrase` varchar(120),
-          			`context` varchar(120),
-  			        `level` varchar(10) NOT NULL DEFAULT '',
-  			        `column_6` varchar(10) NOT NULL DEFAULT '',
-  			        `column_7` varchar(10) NOT NULL DEFAULT '',
-  			        `column_8` varchar(10) NOT NULL DEFAULT '',
-  			        `column_9` varchar(10) NOT NULL DEFAULT '',
-   			      	`column_10` varchar(10) NOT NULL DEFAULT '',
-                                `column_11` varchar(10) NOT NULL DEFAULT '',
-  			        `column_12` varchar(10) NOT NULL DEFAULT '',
-                                `column_13` varchar(10) NOT NULL DEFAULT '',
-                                `column_14` varchar(10) NOT NULL DEFAULT '',
-                                `column_15` varchar(10) NOT NULL DEFAULT '',
-                                `column_16` varchar(10) NOT NULL DEFAULT '',
-                                `lang` varchar(30) NOT NULL DEFAULT ''
-					) DEFAULT CHARSET=utf8; ";
-            // lexicon_word_code
-            $sqls[] = "CREATE TABLE `" . _LEXICON_WORD_CODE . "`(
-                                `id` int unsigned NOT NULL PRIMARY KEY,
-                                `code` varchar(16) NOT NULL DEFAULT '',
-  			        `level` varchar(10) NOT NULL DEFAULT '',
-                                `t_n` varchar(16) NOT NULL DEFAULT '',
-                                `word_coexist` varchar(80) NOT NULL DEFAULT ''
-					) DEFAULT CHARSET=utf8; ";
-            // lexicon_word_details
-            $sqls[] = "CREATE TABLE `" . _LEXICON_WORD_DETAILS . "`(
-                                `code_id` int unsigned NOT NULL,
-                                `word` varchar(30) NOT NULL DEFAULT '',
-                                `phrase` varchar(120),
-  			        `c_l` varchar(10),
-  			        `s_c` varchar(10),
-  			        `g_r` varchar(10),
-  			        `e_j` varchar(10),
-   			      	`p` varchar(10),
-                                `unit` varchar(10),
-  			        `theme` varchar(10),
-                                `context` varchar(10),
-                                CONSTRAINT `WORD_DETAILS_FK03` FOREIGN KEY (code_id) REFERENCES " . _LEXICON_WORD_CODE . " (id)
-                                ON DELETE CASCADE
-                                ON UPDATE CASCADE
-					) DEFAULT CHARSET=utf8; ";
-            $error = false;
-            $wpdb->query('START TRANSACTION');
-            foreach ($sqls as $sql) {
-
-                if (!$wpdb->query($sql)) {
-                    $error = $wpdb->print_error();
-                    break;
-                };
-            }
-
-            if (!$error) {
-                $wpdb->query('COMMIT');
-                add_option("lexicon_db_version", $lexicon_db_version);
-            } else {
-                $wpdb->query('ROLLBACK');
-                echo $error;
-            }
-        } else {
-            // DB version outdated
-
-            $sqls = Array();
-            $sqls[] = "SET foreign_key_checks = 0";
-            //lexicon_course
-            $sqls[] = "ALTER TABLE `" . _LEXICON_COURSE . "` 
-					MODIFY `id` int unsigned NOT NULL auto_increment,
-					MODIFY `lang_1` varchar(30) NOT NULL DEFAULT '',
-					MODIFY `lang_2` varchar(30) NOT NULL DEFAULT '',		
-					MODIFY `level` varchar(10) NOT NULL DEFAULT '',
-					MODIFY `description` varchar(255),
-					DROP PRIMARY KEY,
-					ADD PRIMARY KEY (id)";
-            //lexicon_course_student
-            $sqls[] = "ALTER TABLE `" . _LEXICON_COURSE_STUDENT . "`
-					MODIFY `student_id` bigint(20) NOT NULL DEFAULT 0,
-					MODIFY `course_id` int unsigned NOT NULL DEFAULT 0,
-					MODIFY `state` int unsigned NOT NULL DEFAULT 0,
-					DROP PRIMARY KEY,
-                                        ADD PRIMARY KEY (student_id, course_id),
-					DROP FOREIGN KEY `COURSE_STUDENT_FK01`,
-					CONSTRAINT `COURSE_STUDENT_FK01` FOREIGN KEY (course_id) REFERENCES " . _LEXICON_COURSE . " (id)
-                                        ON DELETE CASCADE
-                                        ON UPDATE CASCADE";
-            // lexicon_course_student_card
-            $sqls[] = "ALTER TABLE `" . _LEXICON_COURSE_SUTDENT_CARD . "`
-					MODIFY `student_id` bigint(20) NOT NULL DEFAULT 0,
-					MODIFY `course_id` int unsigned NOT NULL DEFAULT 0,
-					MODIFY `code` varchar(16) NOT NULL DEFAULT '',
-					MODIFY `prog_level` int unsigned NOT NULL DEFAULT 0,
-					DROP FOREIGN KEY `COURSE_STUDENT_CARD FK02`,
-					DROP FOREIGN KEY `COURSE_STUDENT_CARD FK02`,
-					CONSTRAINT `COURSE_STUDENT_CARD_FK01` FOREIGN KEY (student_id) REFERENCES " . _LEXICON_COURSE_STUDENT . " (student_id)
-                                        ON DELETE CASCADE
-                                        ON UPDATE CASCADE,
-					CONSTRAINT `COURSE_STUDENT_CARD_FK02` FOREIGN KEY (course_id) REFERENCES " . _LEXICON_COURSE . " (id)
-                                        ON DELETE CASCADE
-                                        ON UPDATE CASCADE";
-            // lexicon_course_author
-            $sqls[] = "ALTER TABLE `" . _LEXICON_COURSE_AUTHOR . "`
-					MODIFY `teacher_id` bigint(20) NOT NULL DEFAULT 0,
-					MODIFY `course_id` int unsigned NOT NULL DEFAULT 0,	
-					DROP PRIMARY KEY,								
-					ADD PRIMARY KEY (teacher_id, course_id)";
-            // lexicon_course_codes
-            $sqls[] = "ALTER TABLE `" . _LEXICON_COURSE_CODES . "`
-					MODIFY `course_id` int unsigned NOT NULL DEFAULT 0,
-					MODIFY `code` varchar(16) NOT NULL DEFAULT '',
-                                        MODIFY `context` varchar(120),
-		  			DROP PRIMARY KEY,
-					ADD PRIMARY KEY (course_id, code)";
-            // lexicon_words	
-            $sqls[] = "ALTER TABLE `" . _LEXICON_WORDS . "`
-					MODIFY `id` int unsigned NOT NULL auto_increment,
-					MODIFY `code` varchar(16) NOT NULL DEFAULT '',
-					MODIFY `text` varchar(30) NOT NULL DEFAULT '',
-					MODIFY `phrase` varchar(120),
-                                        MODIFY `context` varchar(120),
-					MODIFY `level` varchar(10) NOT NULL DEFAULT '',
-                                        MODIFY `column_6` varchar(10) NOT NULL DEFAULT '',
-                                        MODIFY `column_7` varchar(10) NOT NULL DEFAULT '',
-                                        MODIFY `column_8` varchar(10) NOT NULL DEFAULT '',
-                                        MODIFY `column_9` varchar(10) NOT NULL DEFAULT '',
-                                        MODIFY `column_10` varchar(10) NOT NULL DEFAULT '',
-                                        MODIFY `column_11` varchar(10) NOT NULL DEFAULT '',
-                                        MODIFY `column_12` varchar(10) NOT NULL DEFAULT '',
-                                        MODIFY `column_13` varchar(10) NOT NULL DEFAULT '',
-                                        MODIFY `column_14` varchar(10) NOT NULL DEFAULT '',
-                                        MODIFY `column_15` varchar(10) NOT NULL DEFAULT '',
-                                        MODIFY `column_16` varchar(10) NOT NULL DEFAULT '',
-                                        MODIFY `lang` varchar(30) NOT NULL DEFAULT '',
-					DROP PRIMARY KEY,
-				  	ADD PRIMARY KEY (id)";
-            // lexicon_word_code
-            $sqls[] = "ALTER TABLE `" . _LEXICON_WORD_CODE . "`
-                                MODIFY `id` int unsigned NOT NULL,
-                                MODIFY `code` varchar(16) NOT NULL DEFAULT '',
-  			        MODIFY `level` varchar(10) NOT NULL DEFAULT '',
-                                MODIFY `t_n` varchar(16) NOT NULL DEFAULT '',
-                                MODIFY `word_coexist` varchar(80) NOT NULL DEFAULT ''
-                                DROP PRIMARY KEY,
-				ADD PRIMARY KEY (id)";
-            // lexicon_word_details
-            $sqls[] = "ALTER TABLE `" . _LEXICON_WORD_DETAILS . "`
-                                MODIFY `code_id` int unsigned NOT NULL,
-                                MODIFY `word` varchar(30) NOT NULL DEFAULT '',
-                                MODIFY `phrase` varchar(120),
-  			        MODIFY `c_l` varchar(10),
-  			        MODIFY `s_c` varchar(10),
-  			        MODIFY `g_r` varchar(10),
-  			        MODIFY `e_j` varchar(10),
-   			      	MODIFY `p` varchar(10),
-                                MODIFY `unit` varchar(10),
-  			        MODIFY `theme` varchar(10),
-                                DROP FOREIGN KEY `WORD_DETAILS FK03`,
-                                CONSTRAINT `WORD_DETAILS_FK03` FOREIGN KEY (code_id) REFERENCES " . _LEXICON_WORD_CODE . " (id)
-                                ON DELETE CASCADE
-                                ON UPDATE CASCADE";
-            $sqls[] = "SET foreign_key_checks = 1";
-
-            $error = false;
-            $wpdb->query('START TRANSACTION');
-            foreach ($sqls as $sql) {
-
-                if (!$wpdb->query($sql)) {
-                    $error = $wpdb->print_error();
-                    break;
-                };
-            }
-
-            if ($error) {
-                $wpdb->query('COMMIT');
-                update_option("lexicon_db_version", $lexicon_db_version);
-            } else {
-                $wpdb->query('ROLLBACK');
-                echo $error;
-            }
-        }
-
-        if (get_page_by_title('LEXICON') == null) {
-            $post = array();
-            $post['post_title'] = 'LEXICON';
-            $post['post_type'] = 'page';
-            $post['post_content'] = '[lexicon]';
-            $post['post_status'] = 'publish';
-            $post['post_author'] = 1;
-            $post['comment_status'] = 'closed';
-            $post['ping_satuts'] = 'closed';
-            $post['page_template'] = 'front-page.php';
-            wp_insert_post($post);
-        }
-        /*
-         * 	Lexicon Options
-         */
-
-        if (get_option("testingv1_install") == "") {
-            add_option("testingv1_install", '1');
-        } else {
-            update_option("testingv1_install", '1');
-        }
-        if (get_option("testingv1_clear_data_deactive") == "") {
-            add_option("testingv1_clear_data_deactive", '1');
-        } else {
-            update_option("testingv1_clear_data_deactive", '1');
-        }
-        if (get_option("testingv1_cleanup_db") == "") {
-            add_option("testingv1_cleanup_db", '1');
-        } else {
-            update_option("testingv1_cleanup_db", '1');
-        }
+        include_once(LEXICON_DIR . '/install.php');
     }
 
     public function plugin_menu() {
@@ -939,7 +536,6 @@ class SP_Plugin {
         }
         return self::$instance;
     }
-
 }
 
 add_action('activate_testingv1/testingv1.php', array('SP_Plugin', 'testingv1_install'));
