@@ -85,6 +85,9 @@ if(get_option('testingv1_cleanup_db') == 1)
   remove_role('lexicon_teacher');
   remove_role('lexicon_editor');
   remove_role('lexicon_admin');
+  
+  //rmdir(LEXICON_UPLOAD_DIR_TEMP_FOLDER . '/temp_csv_files');
+  
 }
 
 ?>
