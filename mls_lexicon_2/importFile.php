@@ -2,7 +2,7 @@
 
 $kv_errors = array();
 
-function lexicon_load($dir, $type) {
+function lexicon_load($dir, $type, $cols_to_add) {
     //echo '<script type="text/javascript">alert("In lexicon load function")</script>';
 
     $directory = opendir($dir);
@@ -10,7 +10,7 @@ function lexicon_load($dir, $type) {
         if ($archive != '.' && $archive != '..') {
             switch ($type) {
                 case 'lang':
-                    $x = lexicon_load_lang($dir, $archive);
+                    $x = lexicon_load_lang($dir, $archive, $cols_to_add);
                     break;
                 case 'course':
                     $x = lexicon_load_course($dir, $archive);
@@ -23,13 +23,28 @@ function lexicon_load($dir, $type) {
     echo "Done";
 }
 
-function lexicon_load_lang($dir, $lang_name) {
+function lexiconSingleBit2Two($param) {
+    if (strlen($param) == 2) {
+        return $param;
+    } else if (strlen($param) == 1) {
+        return '0' . $param;
+    }
+}
+
+function lexiconSingleBit2Three($param) {
+    if (strlen($param) == 3) {
+        return $param;
+    } else if (strlen($param) == 2) {
+        return '0' . $param;
+    } else if (strlen($param) == 1) {
+        return '00' . $param;
+    }
+}
+
+function lexicon_load_lang($dir, $lang_name, $cols_to_add) {
     global $wpdb;
     $absolutepath = $dir . $lang_name;
-    $lang = strstr($lang_name, '-', true);
-    $lang_name = strstr($lang_name, '-');
-    $lang_name = substr($lang_name, 1);
-    $level = strstr($lang_name, '.', true);
+    echo $absolutepath;
     $sqlsTemp = "";
     //$sqls = array();
     //load file
@@ -44,9 +59,72 @@ function lexicon_load_lang($dir, $lang_name) {
             continue;
         }
         $entry_data = explode(';', $lineTempNew);
-        $sqlsTemp .= 'INSERT INTO ' . _LEXICON_WORDS . '(code, text, phrase, context, level, column_6, column_7, column_8, column_9, column_10, column_11, lang) values ("' . $entry_data[0] . '" , "' . $entry_data[1] . '" , "' . $entry_data[2] . '" , "' . $entry_data[3] . '", "' . $level . '" , "' . $entry_data[4] . '" , "' . $entry_data[5] . '" , "' . $entry_data[6] . '" , "' . $entry_data[7] . '" , "' . $entry_data[8] . '" , "' . $entry_data[9] . '" , "' . $lang . '");';
+
+        //Data to process
+        $file_word_id = $entry_data[0];
+        $file_word_code = $entry_data[1];
+        $file_word_level = $entry_data[2];
+        $file_word_tn = $entry_data[3];
+        $file_word_cl = $entry_data[4];
+        $file_word_sc = $entry_data[5];
+        $file_word_gr = $entry_data[6];
+        $file_word_ej = $entry_data[7];
+        $file_word_p = $entry_data[8];
+        $file_word_unit = $entry_data[9];
+        $file_word_theme = $entry_data[10];
+        
+        if(stristr($entry_data[11], "\xEF\xBF\xBD")){
+            $file_word_word = substr($entry_data[11], 0, -1);
+            echo $file_word_word;
+        } else {
+            $file_word_word = $entry_data[11];
+        }
+        if(stristr($entry_data[12], "\xEF\xBF\xBD")){
+            $file_word_phrase = substr($entry_data[12], 0, -1);
+            echo $file_word_phrase;
+        } else {
+            $file_word_phrase = $entry_data[12];
+        }
+        //$file_word_word = substr($entry_data[11], 0, -1);
+        //$file_word_phrase = substr($entry_data[12], 0, -1);
+        
+        //$file_word_word = preg_replace('@\x{FFFD}@u', '_', $entry_data[11]);
+        //$file_word_word = str_replace('_', '', $file_word_word);
+        //$file_word_phrase = preg_replace('@\x{FFFD}@u', '_', $entry_data[12]);
+        //$file_word_phrase = str_replace('_', '', $file_word_phrase);
+
+        $file_word_cl = lexiconSingleBit2Two($file_word_cl);
+        $file_word_sc = lexiconSingleBit2Two($file_word_sc);
+        $file_word_gr = lexiconSingleBit2Two($file_word_gr);
+        $file_word_ej = lexiconSingleBit2Two($file_word_ej);
+        $file_word_p = lexiconSingleBit2Three($file_word_p);
+
+        $cols_to_add_word = $cols_to_add . '_word';
+        $cols_to_add_phrase = $cols_to_add . '_phrase';
+
+        //FIRST TIME UPLOADING
+
+        if ($file_word_word != '') {
+            $word_digit = '1';
+        } else if ($file_word_word == '') {
+            $word_digit = '0';
+        }
+
+        if ($file_word_phrase != '') {
+            $phrase_digit = '1';
+        } else if ($file_word_phrase == '') {
+            $phrase_digit = '0';
+        }
+
+        $file_word_coexist = $word_digit . $phrase_digit;
+
+        $file_word_code = $file_word_cl . $file_word_sc . $file_word_gr . $file_word_ej . $file_word_p;
+
+        $sqlsTemp .= 'INSERT INTO ' . _LEXICON_WORD_CODE . '(id, code, level, t_n, word_coexist) values ("' . $file_word_id . '" , "' . $file_word_code . '"  , "' . $file_word_level . '"  , "' . $file_word_tn . '"  , "' . $file_word_coexist . '");'
+                . 'INSERT INTO ' . _LEXICON_WORD_DETAILS . '(code_id, c_l, s_c, g_r, e_j, p, unit, theme, ' . $cols_to_add_word . ', ' . $cols_to_add_phrase . ') values ("' . $file_word_id . '" , "' . $file_word_cl . '"  , "' . $file_word_sc . '"  , "' . $file_word_gr . '"  , "' . $file_word_ej . '"  , "' . $file_word_p . '"  , "' . $file_word_unit . '"  , "' . $file_word_theme . '" , "' . $file_word_word . '" , "' . $file_word_phrase . '");';
     }
 
+    //echo $sqlsTemp;
     $sqls = explode(';', $sqlsTemp);
     $error = false;
     $wpdb->query('START TRANSACTION');
@@ -65,7 +143,46 @@ function lexicon_load_lang($dir, $lang_name) {
     unlink(LEXICON_FILE_TO_REMOVE);
 }
 
-if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form'])) {
+function lexicon_add_language($cols_to_add) {
+
+    global $wpdb;
+    global $LEXICON_LANGUAGES_FOR_GET_COLUMNS;
+    global $LEXICON_LANGUAGES_FOR_COLUMN_DEFAULT;
+    $cols_to_add_word = $cols_to_add . '_word';
+    $cols_to_add_phrase = $cols_to_add . '_phrase';
+    
+    $testingv1_languages_for_get_columns = "";
+    $testingv1_languages_for_column_default = "";
+    
+    $testingv1_languages_for_get_columns .= "'" . $cols_to_add_word . "' => __('" . $cols_to_add_word . "', 'sp'),
+            '" . $cols_to_add_phrase . "' => __('" . $cols_to_add_phrase . "', 'sp')";
+    
+    $testingv1_languages_for_column_default .= "case '" . $cols_to_add_word . "':
+            case '" . $cols_to_add_phrase . "':";
+    
+    $LEXICON_LANGUAGES_FOR_GET_COLUMNS = $testingv1_languages_for_get_columns;
+    $LEXICON_LANGUAGES_FOR_COLUMN_DEFAULT = testingv1_languages_for_column_default;
+    
+    $add_cols_query = 'ALTER TABLE ' . _LEXICON_WORD_DETAILS . ' ADD ' . $cols_to_add_word . ' varchar(30) NOT NULL DEFAULT "";'
+            . 'ALTER TABLE ' . _LEXICON_WORD_DETAILS . ' ADD ' . $cols_to_add_phrase . ' varchar(120) NOT NULL DEFAULT "";';
+
+    $sqls = explode(';', $add_cols_query);
+    $error = false;
+    $wpdb->query('START TRANSACTION');
+    foreach ($sqls as $sqlQuery) {
+        if (!$wpdb->query($sqlQuery)) {
+            $error = true;
+            break;
+        }
+        if ($error) {
+            $wpdb->query('ROLLBACK');
+        } else {
+            $wpdb->query('COMMIT');
+        }
+    }
+}
+
+if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form']) && isset($_POST['lex_lang'])) {
 
     /* $fields = array(
       'kv_name',
@@ -100,6 +217,11 @@ if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form'])) {
             require_once( ABSPATH . 'wp-admin/includes/file.php' );
         }
 
+        $new_cols_name = $_POST['lex_lang'];
+
+        lexicon_add_language($new_cols_name);
+        //mysql_query("ALTER TABLE birthdays ADD street CHAR(30)");
+
         $uploadedfile = $_FILES['lexicon_file_to_upload'];
 
         $upload_overrides = array('test_form' => false);
@@ -121,19 +243,19 @@ if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form'])) {
             define('LEXICON_FILE_TO_REMOVE', $new_dir);
             $direc = substr($new_dir, 0, -$lex_tempfile_name_length);
             //echo $direc;
-            lexicon_load($direc, 'lang');
-            echo '<script type="text/javascript">location.reload();</script>';
+            lexicon_load($direc, 'lang', $new_cols_name);
+            //echo '<script type="text/javascript">location.reload();</script>';
         }
     } else {
         echo '<script type="text/javascript">alert("Your file was not succesfully uploaded");</script>';
-        echo '<script type="text/javascript">location.reload();</script>';
+        //echo '<script type="text/javascript">location.reload();</script>';
     }
 } else {
     ?>
     <section>
         <label>Language: </label>
 
-        <select>  
+        <select name="lex_lang">  
             <option value=af>Afrikaans</option>
             <option value=sq>Albanian</option>
             <option value=am>Amharic</option>
