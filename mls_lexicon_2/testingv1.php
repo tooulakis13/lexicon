@@ -16,6 +16,12 @@ define('LEXICON_DIR_RELATIVO', dirname(plugin_basename(__FILE__)));
 define('LEXICON_URL', plugin_dir_url(__FILE__));
 define('LEXICON_UPLOAD_DIR', str_replace('plugins\testingv1', '', LEXICON_DIR));
 
+global $LEXICON_LANGUAGES_FOR_GET_COLUMNS;
+global $LEXICON_LANGUAGES_FOR_COLUMN_DEFAULT;
+
+$LEXICON_LANGUAGES_FOR_GET_COLUMNS = "";
+$LEXICON_LANGUAGES_FOR_COLUMN_DEFAULT = "";
+
 define('_LEXICON_COURSE', $wpdb->prefix . 'lexicon_course');
 define('_LEXICON_COURSE_STUDENT', $wpdb->prefix . 'lexicon_course_student');
 define('_LEXICON_COURSE_SUTDENT_CARD', $wpdb->prefix . 'lexicon_course_student_card');
@@ -54,7 +60,12 @@ class Lexicon_words_List extends WP_List_Table {
      */
     public static function get_lexicon_words($per_page = 5, $page_number = 1) {
         global $wpdb;
-        $sql = "SELECT * FROM {$wpdb->prefix}lexicon_words";
+
+        $sql = "SELECT *
+                FROM " . _LEXICON_WORD_CODE . "
+                INNER JOIN " . _LEXICON_WORD_DETAILS . " ON " . _LEXICON_WORD_CODE . ".id=" . _LEXICON_WORD_DETAILS . ".code_id";
+
+        //$sql = "SELECT * FROM {$wpdb->prefix}lexicon_words";
         if (!empty($_REQUEST['orderby'])) {
             $sql .= ' ORDER BY ' . esc_sql($_REQUEST['orderby']);
             $sql .= !empty($_REQUEST['order']) ? ' ' . esc_sql($_REQUEST['order']) : ' ASC';
@@ -159,7 +170,7 @@ class Lexicon_words_List extends WP_List_Table {
      */
     public static function record_count() {
         global $wpdb;
-        $sql = "SELECT COUNT(*) FROM {$wpdb->prefix}lexicon_words";
+        $sql = "SELECT COUNT(*) FROM " . _LEXICON_WORD_DETAILS;
         return $wpdb->get_var($sql);
     }
 
@@ -177,24 +188,25 @@ class Lexicon_words_List extends WP_List_Table {
      * @return mixed
      */
     public function column_default($item, $column_name) {
+        global $LEXICON_LANGUAGES_FOR_COLUMN_DEFAULT;
         switch ($column_name) {
+            case 'code_id':
             case 'code':
-            case 'text':
-            case 'phrase':
-            case 'context':
-            case 'column_6':
-            case 'column_7':
-            case 'column_8':
-            case 'column_9':
-            case 'column_10':
-            case 'column_11':
-            case 'column_12':
-            case 'column_13':
-            case 'column_14':
-            case 'column_15':
-            case 'column_16':
             case 'level':
-            case 'lang':
+            case 't_n':
+            case 'word_coexist':
+            case 'c_l':
+            case 's_c':
+            case 'g_r':
+            case 'e_j':
+            case 'p':
+            case 'unit':
+            case 'theme':
+            if ($LEXICON_LANGUAGES_FOR_COLUMN_DEFAULT != "") {
+                echo $LEXICON_LANGUAGES_FOR_COLUMN_DEFAULT;
+            }else {
+                echo "";
+            }
                 return $item[$column_name];
             default:
                 return print_r($item, true); //Show the whole array for troubleshooting purposes
@@ -208,7 +220,7 @@ class Lexicon_words_List extends WP_List_Table {
      *
      * @return string
      */
-    function column_cb($item) {
+    function column_code_id($item) {
         return sprintf(
                 '<input type="checkbox" name="bulk-delete[]" value="%s" />', $item['id']
         );
@@ -260,9 +272,9 @@ class Lexicon_words_List extends WP_List_Table {
 
             $attributes = "id='$atts_row_id' class='$classes' $data";
 
-            if ('cb' === $column_name) {
-                echo '<th scope="row" class="check-column">';
-                echo $this->column_cb($item);
+            if ('code_id' === $column_name) {
+                echo "<th $attributes>";
+                echo $this->column_code_id($item);
                 echo '</th>';
             } elseif (method_exists($this, '_column_' . $column_name)) {
                 echo call_user_func(
@@ -288,25 +300,21 @@ class Lexicon_words_List extends WP_List_Table {
      * @return array
      */
     function get_columns() {
+        global $LEXICON_LANGUAGES_FOR_GET_COLUMNS;
         $columns = [
-            'cb' => '<input type="checkbox" />',
+            'code_id' => '<input type="checkbox" />',
             'code' => __('Code', 'sp'),
-            'text' => __('Text', 'sp'),
-            'phrase' => __('Phrase', 'sp'),
-            'context' => __('Context', 'sp'),
             'level' => __('Level', 'sp'),
-            'column_6' => __('Column 6', 'sp'),
-            'column_7' => __('Column 7', 'sp'),
-            'column_8' => __('Column 8', 'sp'),
-            'column_9' => __('Column 9', 'sp'),
-            'column_10' => __('Column 10', 'sp'),
-            'column_11' => __('Column 11', 'sp'),
-            'column_12' => __('Column 12', 'sp'),
-            'column_13' => __('Column 13', 'sp'),
-            'column_14' => __('Column 14', 'sp'),
-            'column_15' => __('Column 15', 'sp'),
-            'column_16' => __('Column 16', 'sp'),
-            'lang' => __('Lang', 'sp')
+            't_n' => __('T_N', 'sp'),
+            'word_coexist' => __('Word Coexist', 'sp'),
+            'c_l' => __('C_L', 'sp'),
+            's_c' => __('S_C', 'sp'),
+            'g_r' => __('G_R', 'sp'),
+            'e_j' => __('E_J', 'sp'),
+            'p' => __('P', 'sp'),
+            'unit' => __('Unit', 'sp'),
+            'theme' => __('Theme', 'sp'),
+            $LEXICON_LANGUAGES_FOR_GET_COLUMNS
         ];
         return $columns;
     }
@@ -319,7 +327,7 @@ class Lexicon_words_List extends WP_List_Table {
     public function get_sortable_columns() {
         $sortable_columns = array(
             'code' => array('code', true),
-            'text' => array('text', false)
+            'en_word' => array('text', false)
         );
         return $sortable_columns;
     }
@@ -427,12 +435,24 @@ class SP_Plugin {
         add_action('admin_menu', [$this, 'plugin_menu']);
         add_action('admin_enqueue_scripts', array(&$this, 'testingv1_add_javascript'));
         add_action('wp_print_scripts', array(&$this, 'testingv1_add_javascript'));
+        add_action('admin_enqueue_scripts', array(&$this, 'testingv1_add_stylesheet'));
+        add_action('wp_print_styles', array(&$this, 'testingv1_add_stylesheet'));
     }
 
     public static function set_screen($status, $option, $value) {
         return $value;
     }
 
+    function testingv1_add_stylesheet() {
+        $styleUrl = plugins_url('css/testingv1.css', __FILE__);
+        $styleFile = WP_PLUGIN_DIR . '/testingv1/css/testingv1.css';
+
+        if (file_exists($styleFile)) {
+            wp_register_style('testingv1', $styleUrl, array(), '', 'screen');
+            wp_enqueue_style('testingv1');
+        }
+    }
+            
     function testingv1_add_javascript() {
         $scriptUrl = plugins_url('js/testingv1.js', __FILE__);
         $scriptFile = WP_PLUGIN_DIR . '/testingv1/js/testingv1.js';
@@ -536,6 +556,7 @@ class SP_Plugin {
         }
         return self::$instance;
     }
+
 }
 
 add_action('activate_testingv1/testingv1.php', array('SP_Plugin', 'testingv1_install'));
