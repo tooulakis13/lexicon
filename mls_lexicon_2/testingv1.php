@@ -16,12 +16,6 @@ define('LEXICON_DIR_RELATIVO', dirname(plugin_basename(__FILE__)));
 define('LEXICON_URL', plugin_dir_url(__FILE__));
 define('LEXICON_UPLOAD_DIR', str_replace('plugins\testingv1', '', LEXICON_DIR));
 
-global $LEXICON_LANGUAGES_FOR_GET_COLUMNS;
-global $LEXICON_LANGUAGES_FOR_COLUMN_DEFAULT;
-
-$LEXICON_LANGUAGES_FOR_GET_COLUMNS = "";
-$LEXICON_LANGUAGES_FOR_COLUMN_DEFAULT = "";
-
 define('_LEXICON_COURSE', $wpdb->prefix . 'lexicon_course');
 define('_LEXICON_COURSE_STUDENT', $wpdb->prefix . 'lexicon_course_student');
 define('_LEXICON_COURSE_SUTDENT_CARD', $wpdb->prefix . 'lexicon_course_student_card');
@@ -188,7 +182,6 @@ class Lexicon_words_List extends WP_List_Table {
      * @return mixed
      */
     public function column_default($item, $column_name) {
-        global $LEXICON_LANGUAGES_FOR_COLUMN_DEFAULT;
         switch ($column_name) {
             case 'code_id':
             case 'code':
@@ -202,11 +195,8 @@ class Lexicon_words_List extends WP_List_Table {
             case 'p':
             case 'unit':
             case 'theme':
-            if ($LEXICON_LANGUAGES_FOR_COLUMN_DEFAULT != "") {
-                echo $LEXICON_LANGUAGES_FOR_COLUMN_DEFAULT;
-            }else {
-                echo "";
-            }
+            case 'af_word':
+            case 'af_phrase':
                 return $item[$column_name];
             default:
                 return print_r($item, true); //Show the whole array for troubleshooting purposes
@@ -300,23 +290,194 @@ class Lexicon_words_List extends WP_List_Table {
      * @return array
      */
     function get_columns() {
-        global $LEXICON_LANGUAGES_FOR_GET_COLUMNS;
-        $columns = [
-            'code_id' => '<input type="checkbox" />',
-            'code' => __('Code', 'sp'),
-            'level' => __('Level', 'sp'),
-            't_n' => __('T_N', 'sp'),
-            'word_coexist' => __('Word Coexist', 'sp'),
-            'c_l' => __('C_L', 'sp'),
-            's_c' => __('S_C', 'sp'),
-            'g_r' => __('G_R', 'sp'),
-            'e_j' => __('E_J', 'sp'),
-            'p' => __('P', 'sp'),
-            'unit' => __('Unit', 'sp'),
-            'theme' => __('Theme', 'sp'),
-            $LEXICON_LANGUAGES_FOR_GET_COLUMNS
-        ];
+
+        global $wpdb;
+        $databaseName = $wpdb->dbname;
+
+        $word_details_cols = $wpdb->get_results("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='$databaseName' AND TABLE_NAME='" . _LEXICON_WORD_DETAILS . "';");
+
+        if (count($word_details_cols) == 8) {
+            $theArrayResult = [
+                'code_id' => '<input type="checkbox" />',
+                'code' => __('Code', 'sp'),
+                'level' => __('Level', 'sp'),
+                't_n' => __('T_N', 'sp'),
+                'word_coexist' => __('Word Coexist', 'sp'),
+                'c_l' => __('C_L', 'sp'),
+                's_c' => __('S_C', 'sp'),
+                'g_r' => __('G_R', 'sp'),
+                'e_j' => __('E_J', 'sp'),
+                'p' => __('P', 'sp'),
+                'unit' => __('Unit', 'sp'),
+                'theme' => __('Theme', 'sp'),
+            ];
+            //return $theArrayResult;
+        } else {
+            $endCount = count($word_details_cols);
+            $theArrayResultTempA = ['code_id' => '<input type="checkbox" />',
+                'code' => __('Code', 'sp'),
+                'level' => __('Level', 'sp'),
+                't_n' => __('T_N', 'sp'),
+                'word_coexist' => __('Word Coexist', 'sp'),
+                'c_l' => __('C_L', 'sp'),
+                's_c' => __('S_C', 'sp'),
+                'g_r' => __('G_R', 'sp'),
+                'e_j' => __('E_J', 'sp'),
+                'p' => __('P', 'sp'),
+                'unit' => __('Unit', 'sp'),
+                'theme' => __('Theme', 'sp'),];
+            for ($i = 8; $i <= $endCount - 1; $i++) {
+                $column_nameA = $word_details_cols[$i]->COLUMN_NAME;
+                if ($i % 2 == 0) {
+                    $fullLanguage = $this->shortLangToFull(str_replace("_word", "", "$column_nameA"));
+                    $column_nameB = $fullLanguage . " Word";
+                } else {
+                    $fullLanguage = $this->shortLangToFull(str_replace("_phrase", "", "$column_nameA"));
+                    $column_nameB = $fullLanguage . " Phrase";
+                }
+                //$column_nameA = $word_details_cols[$i]->COLUMN_NAME;
+                //$column_nameB = $word_details_cols[$i]->COLUMN_NAME;
+                //$theArrayResult = [];
+                $theArrayResultTempB = ["$column_nameA" => __("$column_nameB", 'sp'),];
+                $theArrayResultTempA = array_merge($theArrayResultTempA, $theArrayResultTempB);
+                //$i = $i + 2;
+                $theArrayResult = $theArrayResultTempA;
+            }
+            //echo print_r($theArrayResultTempA);
+            //return $theArrayResultTempA;
+        }
+        return $theArrayResult;
+
+        /* $columns = [
+          'code_id' => '<input type="checkbox" />',
+          'code' => __('Code', 'sp'),
+          'level' => __('Level', 'sp'),
+          't_n' => __('T_N', 'sp'),
+          'word_coexist' => __('Word Coexist', 'sp'),
+          'c_l' => __('C_L', 'sp'),
+          's_c' => __('S_C', 'sp'),
+          'g_r' => __('G_R', 'sp'),
+          'e_j' => __('E_J', 'sp'),
+          'p' => __('P', 'sp'),
+          'unit' => __('Unit', 'sp'),
+          'theme' => __('Theme', 'sp'),
+          ]; */
+
+        //$columnsPt2 = [];
+        //$columnsPt2 = testingv1_get_word_details_cols();
+        //$columns = array_merge($columns, $columnsPt2);
+        echo print_r($columns);
+        echo '<br/><br/>';
+        //echo print_r($columnsPt2);
         return $columns;
+    }
+
+    public function shortLangToFull($variable) {
+        switch ($variable) {
+            case 'af': return 'Afrikaans';
+            case 'sq': return 'Albanian';
+            case 'am': return 'Amharic';
+            case 'ar': return 'Arabic';
+            case 'hy': return 'Armenian';
+            case 'az': return 'Azerbaijani';
+            case 'eu': return 'Basque';
+            case 'be': return 'Belarusian';
+            case 'bn': return 'Bengali';
+            case 'bs': return 'Bosnian';
+            case 'bg': return 'Bulgarian';
+            case 'ca': return 'Catalan';
+            case 'ce': return 'Cebuano';
+            case 'ny': return 'Chichewa';
+            case 'zh-CN': return 'Chinese';
+            case 'co': return 'Corsican';
+            case 'hr': return 'Croatian';
+            case 'cs': return 'Czech';
+            case 'da': return 'Danish';
+            case 'nl': return 'Dutch';
+            case 'en': return 'English';
+            case 'eo': return 'Esperanto';
+            case 'et': return 'Estonian';
+            case 'tl': return 'Filipino';
+            case 'fi': return 'Finnish';
+            case 'fr': return 'French';
+            case 'fy': return 'Frisian';
+            case 'gl': return 'Galician';
+            case 'ka': return 'Georgian';
+            case 'de': return 'German';
+            case 'el': return 'Greek';
+            case 'gu': return 'Gujarati';
+            case 'ht': return 'Haitian Creole';
+            case 'ha': return 'Hausa';
+            case 'haw': return 'Hawaiian';
+            case 'iw': return 'Hebrew';
+            case 'hi': return 'Hindi';
+            case 'hmn': return 'Hmong';
+            case 'hu': return 'Hungarian';
+            case 'is': return 'Icelandic';
+            case 'ig': return 'Igbo';
+            case 'id': return 'Indonesian';
+            case 'ga': return 'Irish';
+            case 'it': return 'Italian';
+            case 'ja': return 'Japanese';
+            case 'jw': return 'Javanese';
+            case 'kn': return 'Kannada';
+            case 'kk': return 'Kazakh';
+            case 'km': return 'Khmer';
+            case 'ko': return 'Korean';
+            case 'ku': return 'Kurdish (Kurmanji)';
+            case 'ky': return 'Kyrgyz';
+            case 'lo': return 'Lao';
+            case 'la': return 'Latin';
+            case 'lv': return 'Latvian';
+            case 'lt': return 'Lithuanian';
+            case 'lb': return 'Luxembourgish';
+            case 'mk': return 'Macedonian';
+            case 'mg': return 'Malagasy';
+            case 'ms': return 'Malay';
+            case 'ml': return 'Malayalam';
+            case 'mt': return 'Maltese';
+            case 'mi': return 'Maori';
+            case 'mr': return 'Marathi';
+            case 'mn': return 'Mongolian';
+            case 'my': return 'Myanmar (Burmese)';
+            case 'ne': return 'Nepali';
+            case 'no': return 'Norwegian';
+            case 'ps': return 'Pashto';
+            case 'fa': return 'Persian';
+            case 'pl': return 'Polish';
+            case 'pt': return 'Portuguese';
+            case 'pa': return 'Punjabi';
+            case 'ro': return 'Romanian';
+            case 'ru': return 'Russian';
+            case 'sm': return 'Samoan';
+            case 'gd': return 'Scots Gaelic';
+            case 'sr': return 'Serbian';
+            case 'st': return 'Sesotho';
+            case 'sn': return 'Shona';
+            case 'sd': return 'Sindhi';
+            case 'si': return 'Sinhala';
+            case 'sk': return 'Slovak';
+            case 'sl': return 'Slovenian';
+            case 'so': return 'Somali';
+            case 'es': return 'Spanish';
+            case 'su': return 'Sundanese';
+            case 'sw': return 'Swahili';
+            case 'sv': return 'Swedish';
+            case 'tg': return 'Tajik';
+            case 'ta': return 'Tamil';
+            case 'te': return 'Telugu';
+            case 'th': return 'Thai';
+            case 'tr': return 'Turkish';
+            case 'uk': return 'Ukrainian';
+            case 'ur': return 'Urdu';
+            case 'uz': return 'Uzbek';
+            case 'vi': return 'Vietnamese';
+            case 'cy': return 'Welsh';
+            case 'xh': return 'Xhosa';
+            case 'yi': return 'Yiddish';
+            case 'yo': return 'Yoruba';
+            case 'zu': return 'Zulu';
+        }
     }
 
     /**
@@ -374,15 +535,15 @@ class Lexicon_words_List extends WP_List_Table {
                 <input type="button" id="exportCsvId" onclick="exportCsv()" class="button-primary" value="Export">
             </div>
             <br class="clear" />
-            <?php if ($this->has_items()): ?>
+        <?php if ($this->has_items()): ?>
                 <div class="alignleft actions bulkactions">
-                    <?php $this->bulk_actions($which); ?>
+                <?php $this->bulk_actions($which); ?>
                 </div>
-                <?php
-            endif;
-            $this->extra_tablenav($which);
-            $this->pagination($which);
-            ?>
+                    <?php
+                endif;
+                $this->extra_tablenav($which);
+                $this->pagination($which);
+                ?>
 
             <br class="clear" />
         </div>
@@ -452,7 +613,7 @@ class SP_Plugin {
             wp_enqueue_style('testingv1');
         }
     }
-            
+
     function testingv1_add_javascript() {
         $scriptUrl = plugins_url('js/testingv1.js', __FILE__);
         $scriptFile = WP_PLUGIN_DIR . '/testingv1/js/testingv1.js';
@@ -511,10 +672,10 @@ class SP_Plugin {
                         <div id="lexicon-table-content-main" class="meta-box-sortables ui-sortable">
                             <form method="post" enctype="multipart/form-data" id="lexicon-form-full">
                                 <div id="lexicon-table-content">
-                                    <?php
-                                    $this->lexicon_words_obj->prepare_items();
-                                    $this->lexicon_words_obj->display();
-                                    ?>
+        <?php
+        $this->lexicon_words_obj->prepare_items();
+        $this->lexicon_words_obj->display();
+        ?>
                                 </div>
                             </form>
                             <div id="lexicon-add-word">
@@ -522,7 +683,7 @@ class SP_Plugin {
                             </div>
                             <div id="lexicon-import-file">
                                 <form method="post" enctype="multipart/form-data" action="">
-                                    <?php include_once('importFile.php'); ?>
+        <?php include_once('importFile.php'); ?>
                                 </form>
                             </div>
 
