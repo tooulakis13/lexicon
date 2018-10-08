@@ -72,26 +72,19 @@ function lexicon_load_lang($dir, $lang_name, $cols_to_add) {
         $file_word_p = $entry_data[8];
         $file_word_unit = $entry_data[9];
         $file_word_theme = $entry_data[10];
-        
-        if(stristr($entry_data[11], "\xEF\xBF\xBD")){
+
+        if (stristr($entry_data[11], "\xEF\xBF\xBD")) {
             $file_word_word = substr($entry_data[11], 0, -1);
             echo $file_word_word;
         } else {
             $file_word_word = $entry_data[11];
         }
-        if(stristr($entry_data[12], "\xEF\xBF\xBD")){
+        if (stristr($entry_data[12], "\xEF\xBF\xBD")) {
             $file_word_phrase = substr($entry_data[12], 0, -1);
             echo $file_word_phrase;
         } else {
             $file_word_phrase = $entry_data[12];
         }
-        //$file_word_word = substr($entry_data[11], 0, -1);
-        //$file_word_phrase = substr($entry_data[12], 0, -1);
-        
-        //$file_word_word = preg_replace('@\x{FFFD}@u', '_', $entry_data[11]);
-        //$file_word_word = str_replace('_', '', $file_word_word);
-        //$file_word_phrase = preg_replace('@\x{FFFD}@u', '_', $entry_data[12]);
-        //$file_word_phrase = str_replace('_', '', $file_word_phrase);
 
         $file_word_cl = lexiconSingleBit2Two($file_word_cl);
         $file_word_sc = lexiconSingleBit2Two($file_word_sc);
@@ -120,8 +113,22 @@ function lexicon_load_lang($dir, $lang_name, $cols_to_add) {
 
         $file_word_code = $file_word_cl . $file_word_sc . $file_word_gr . $file_word_ej . $file_word_p;
 
-        $sqlsTemp .= 'INSERT INTO ' . _LEXICON_WORD_CODE . '(id, code, level, t_n, word_coexist) values ("' . $file_word_id . '" , "' . $file_word_code . '"  , "' . $file_word_level . '"  , "' . $file_word_tn . '"  , "' . $file_word_coexist . '");'
-                . 'INSERT INTO ' . _LEXICON_WORD_DETAILS . '(code_id, c_l, s_c, g_r, e_j, p, unit, theme, ' . $cols_to_add_word . ', ' . $cols_to_add_phrase . ') values ("' . $file_word_id . '" , "' . $file_word_cl . '"  , "' . $file_word_sc . '"  , "' . $file_word_gr . '"  , "' . $file_word_ej . '"  , "' . $file_word_p . '"  , "' . $file_word_unit . '"  , "' . $file_word_theme . '" , "' . $file_word_word . '" , "' . $file_word_phrase . '");';
+        $result = $wpdb->get_results('SELECT * FROM ' . _LEXICON_WORD_CODE . ' WHERE id IS NOT NULL');
+
+        $checkIdExist = $wpdb->get_results('SELECT * FROM ' . _LEXICON_WORD_CODE . ' WHERE id = ' . $file_word_id . '');
+
+        if (count($result) == 0) {
+            //>>>QUERY USED FOR THE FIRST IMPORTED FILE<<<
+            $sqlsTemp .= 'INSERT INTO ' . _LEXICON_WORD_CODE . '(id, code, level, t_n, word_coexist) values ("' . $file_word_id . '" , "' . $file_word_code . '"  , "' . $file_word_level . '"  , "' . $file_word_tn . '"  , "' . $file_word_coexist . '");'
+                    . 'INSERT INTO ' . _LEXICON_WORD_DETAILS . '(code_id, c_l, s_c, g_r, e_j, p, unit, theme, ' . $cols_to_add_word . ', ' . $cols_to_add_phrase . ') values ("' . $file_word_id . '" , "' . $file_word_cl . '"  , "' . $file_word_sc . '"  , "' . $file_word_gr . '"  , "' . $file_word_ej . '"  , "' . $file_word_p . '"  , "' . $file_word_unit . '"  , "' . $file_word_theme . '" , "' . $file_word_word . '" , "' . $file_word_phrase . '");';
+        } else if (count($result) != 0 && count($checkIdExist) == 1) {
+            //>>>QUERY USED FOR THE REST OF THE FILES IN CASE THERE ARE NO NEW WORDS IN THE CSV FILE<<<
+            $sqlsTemp .= 'UPDATE ' . _LEXICON_WORD_DETAILS . ' SET ' . $cols_to_add_word . ' = "' . $file_word_word . '", ' . $cols_to_add_phrase . ' = "' . $file_word_phrase . '" WHERE code_id = ' . $file_word_id . ';';
+        } else if (count($result) != 0 && count($checkIdExist) == 0) {
+            //>>>QUERY USED FOR THE REST OF THE FILES IN CASE THERE ARE NEW WORDS IN THE CSV FILE<<<
+            $sqlsTemp .= 'INSERT INTO ' . _LEXICON_WORD_CODE . '(id, code, level, t_n, word_coexist) values ("' . $file_word_id . '" , "' . $file_word_code . '"  , "' . $file_word_level . '"  , "' . $file_word_tn . '"  , "' . $file_word_coexist . '");'
+                    . 'INSERT INTO ' . _LEXICON_WORD_DETAILS . '(code_id, c_l, s_c, g_r, e_j, p, unit, theme, ' . $cols_to_add_word . ', ' . $cols_to_add_phrase . ') values ("' . $file_word_id . '" , "' . $file_word_cl . '"  , "' . $file_word_sc . '"  , "' . $file_word_gr . '"  , "' . $file_word_ej . '"  , "' . $file_word_p . '"  , "' . $file_word_unit . '"  , "' . $file_word_theme . '" , "' . $file_word_word . '" , "' . $file_word_phrase . '");';
+        }
     }
 
     //echo $sqlsTemp;
@@ -146,38 +153,71 @@ function lexicon_load_lang($dir, $lang_name, $cols_to_add) {
 function lexicon_add_language($cols_to_add) {
 
     global $wpdb;
-    global $LEXICON_LANGUAGES_FOR_GET_COLUMNS;
-    global $LEXICON_LANGUAGES_FOR_COLUMN_DEFAULT;
+
     $cols_to_add_word = $cols_to_add . '_word';
     $cols_to_add_phrase = $cols_to_add . '_phrase';
-    
+
     $testingv1_languages_for_get_columns = "";
     $testingv1_languages_for_column_default = "";
+
+    $testingv1_languages_for_get_columns = [
+        "'$cols_to_add_word'" => __("'$cols_to_add word'", 'sp'),
+        "'$cols_to_add_phrase'" => __("'$cols_to_add phrase'", 'sp'),
+    ];
+
+
+
+    //echo print_r($testingv1_languages_for_get_columns);
+
+    /*$filename = 'lexiconColumns.txt';
+
+    if (file_exists($filename)) {
+        file_put_contents(LEXICON_DIR . "\lexiconColumns.txt", $testingv1_languages_for_get_columns, FILE_APPEND);
+    } else {
+        file_put_contents(LEXICON_DIR . "\lexiconColumns.txt", $testingv1_languages_for_get_columns, FILE_APPEND);
+    }*/
     
-    $testingv1_languages_for_get_columns .= "'" . $cols_to_add_word . "' => __('" . $cols_to_add_word . "', 'sp'),
-            '" . $cols_to_add_phrase . "' => __('" . $cols_to_add_phrase . "', 'sp')";
-    
+    //echo LEXICON_DIR;
+
     $testingv1_languages_for_column_default .= "case '" . $cols_to_add_word . "':
             case '" . $cols_to_add_phrase . "':";
-    
-    $LEXICON_LANGUAGES_FOR_GET_COLUMNS = $testingv1_languages_for_get_columns;
-    $LEXICON_LANGUAGES_FOR_COLUMN_DEFAULT = testingv1_languages_for_column_default;
-    
-    $add_cols_query = 'ALTER TABLE ' . _LEXICON_WORD_DETAILS . ' ADD ' . $cols_to_add_word . ' varchar(30) NOT NULL DEFAULT "";'
-            . 'ALTER TABLE ' . _LEXICON_WORD_DETAILS . ' ADD ' . $cols_to_add_phrase . ' varchar(120) NOT NULL DEFAULT "";';
 
-    $sqls = explode(';', $add_cols_query);
-    $error = false;
-    $wpdb->query('START TRANSACTION');
-    foreach ($sqls as $sqlQuery) {
-        if (!$wpdb->query($sqlQuery)) {
-            $error = true;
-            break;
-        }
-        if ($error) {
-            $wpdb->query('ROLLBACK');
-        } else {
-            $wpdb->query('COMMIT');
+    if ($testingv1_languages_for_get_columns != "" && $testingv1_languages_for_column_default != "") {
+        $LEXICON_LANGUAGES_FOR_GET_COLUMNS = $testingv1_languages_for_get_columns;
+        $LEXICON_LANGUAGES_FOR_COLUMN_DEFAULT = $testingv1_languages_for_column_default;
+    } else {
+        $LEXICON_LANGUAGES_FOR_GET_COLUMNS = "hello";
+        $LEXICON_LANGUAGES_FOR_COLUMN_DEFAULT = "hello";
+    }
+
+    echo '<br/>';
+    //echo $LEXICON_LANGUAGES_FOR_GET_COLUMNS;
+    echo '<br/>';
+    //echo $LEXICON_LANGUAGES_FOR_COLUMN_DEFAULT;
+    echo '<br/>';
+
+    $databaseName = $wpdb->dbname;
+    $checkColExist = $wpdb->get_results("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='$databaseName' AND TABLE_NAME='" . _LEXICON_WORD_DETAILS . "' and column_name='$cols_to_add_word';");
+
+    //echo print_r($result);
+
+    if (!$checkColExist) {
+        $add_cols_query = 'ALTER TABLE ' . _LEXICON_WORD_DETAILS . ' ADD ' . $cols_to_add_word . ' varchar(30) NOT NULL DEFAULT "";'
+                . 'ALTER TABLE ' . _LEXICON_WORD_DETAILS . ' ADD ' . $cols_to_add_phrase . ' varchar(120) NOT NULL DEFAULT "";';
+        echo $add_cols_query;
+        $sqls = explode(';', $add_cols_query);
+        $error = false;
+        $wpdb->query('START TRANSACTION');
+        foreach ($sqls as $sqlQuery) {
+            if (!$wpdb->query($sqlQuery)) {
+                $error = true;
+                break;
+            }
+            if ($error) {
+                $wpdb->query('ROLLBACK');
+            } else {
+                $wpdb->query('COMMIT');
+            }
         }
     }
 }
@@ -221,6 +261,8 @@ if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form']) && isse
 
         lexicon_add_language($new_cols_name);
         //mysql_query("ALTER TABLE birthdays ADD street CHAR(30)");
+        
+        testingv1_get_word_details_cols();
 
         $uploadedfile = $_FILES['lexicon_file_to_upload'];
 
