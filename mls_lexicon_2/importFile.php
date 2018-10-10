@@ -169,14 +169,14 @@ function lexicon_add_language($cols_to_add) {
 
     //echo print_r($testingv1_languages_for_get_columns);
 
-    /*$filename = 'lexiconColumns.txt';
+    /* $filename = 'lexiconColumns.txt';
 
-    if (file_exists($filename)) {
-        file_put_contents(LEXICON_DIR . "\lexiconColumns.txt", $testingv1_languages_for_get_columns, FILE_APPEND);
-    } else {
-        file_put_contents(LEXICON_DIR . "\lexiconColumns.txt", $testingv1_languages_for_get_columns, FILE_APPEND);
-    }*/
-    
+      if (file_exists($filename)) {
+      file_put_contents(LEXICON_DIR . "\lexiconColumns.txt", $testingv1_languages_for_get_columns, FILE_APPEND);
+      } else {
+      file_put_contents(LEXICON_DIR . "\lexiconColumns.txt", $testingv1_languages_for_get_columns, FILE_APPEND);
+      } */
+
     //echo LEXICON_DIR;
 
     $testingv1_languages_for_column_default .= "case '" . $cols_to_add_word . "':
@@ -259,10 +259,9 @@ if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form']) && isse
 
         $new_cols_name = $_POST['lex_lang'];
 
-        lexicon_add_language($new_cols_name);
-        //mysql_query("ALTER TABLE birthdays ADD street CHAR(30)");
         
-        testingv1_get_word_details_cols();
+        //mysql_query("ALTER TABLE birthdays ADD street CHAR(30)");
+        //testingv1_get_word_details_cols();
 
         $uploadedfile = $_FILES['lexicon_file_to_upload'];
 
@@ -285,13 +284,13 @@ if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form']) && isse
             define('LEXICON_FILE_TO_REMOVE', $new_dir);
             $direc = substr($new_dir, 0, -$lex_tempfile_name_length);
             //echo $direc;
+            lexicon_add_language($new_cols_name);
             lexicon_load($direc, 'lang', $new_cols_name);
-            //echo '<script type="text/javascript">location.reload();</script>';
+            echo '<script type="text/javascript">location.reload();</script>';
+        } else {
+            echo '<script type="text/javascript">alert("Your file was not succesfully uploaded");location.reload();</script>';
         }
-    } else {
-        echo '<script type="text/javascript">alert("Your file was not succesfully uploaded");</script>';
-        //echo '<script type="text/javascript">location.reload();</script>';
-    }
+    } 
 } else {
     ?>
     <section>
