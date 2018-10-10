@@ -182,24 +182,18 @@ class Lexicon_words_List extends WP_List_Table {
      * @return mixed
      */
     public function column_default($item, $column_name) {
-        switch ($column_name) {
-            case 'code_id':
-            case 'code':
-            case 'level':
-            case 't_n':
-            case 'word_coexist':
-            case 'c_l':
-            case 's_c':
-            case 'g_r':
-            case 'e_j':
-            case 'p':
-            case 'unit':
-            case 'theme':
-            case 'af_word':
-            case 'af_phrase':
+
+        global $wpdb;
+        $databaseName = $wpdb->dbname;
+
+        $word_details_cols = $wpdb->get_results("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='$databaseName' AND TABLE_NAME='" . _LEXICON_WORD_DETAILS . "' OR TABLE_NAME='" . _LEXICON_WORD_CODE . "';");
+
+        for ($i = 0; $i <= count($word_details_cols) - 1; $i++) {
+            $column_nameA = $word_details_cols[$i]->COLUMN_NAME;
+
+            while ($column_name == $column_nameA) {
                 return $item[$column_name];
-            default:
-                return print_r($item, true); //Show the whole array for troubleshooting purposes
+            }
         }
     }
 
@@ -535,15 +529,15 @@ class Lexicon_words_List extends WP_List_Table {
                 <input type="button" id="exportCsvId" onclick="exportCsv()" class="button-primary" value="Export">
             </div>
             <br class="clear" />
-        <?php if ($this->has_items()): ?>
+            <?php if ($this->has_items()): ?>
                 <div class="alignleft actions bulkactions">
-                <?php $this->bulk_actions($which); ?>
+                    <?php $this->bulk_actions($which); ?>
                 </div>
-                    <?php
-                endif;
-                $this->extra_tablenav($which);
-                $this->pagination($which);
-                ?>
+                <?php
+            endif;
+            $this->extra_tablenav($which);
+            $this->pagination($which);
+            ?>
 
             <br class="clear" />
         </div>
@@ -672,10 +666,10 @@ class SP_Plugin {
                         <div id="lexicon-table-content-main" class="meta-box-sortables ui-sortable">
                             <form method="post" enctype="multipart/form-data" id="lexicon-form-full">
                                 <div id="lexicon-table-content">
-        <?php
-        $this->lexicon_words_obj->prepare_items();
-        $this->lexicon_words_obj->display();
-        ?>
+                                    <?php
+                                    $this->lexicon_words_obj->prepare_items();
+                                    $this->lexicon_words_obj->display();
+                                    ?>
                                 </div>
                             </form>
                             <div id="lexicon-add-word">
@@ -683,7 +677,7 @@ class SP_Plugin {
                             </div>
                             <div id="lexicon-import-file">
                                 <form method="post" enctype="multipart/form-data" action="">
-        <?php include_once('importFile.php'); ?>
+                                    <?php include_once('importFile.php'); ?>
                                 </form>
                             </div>
 
