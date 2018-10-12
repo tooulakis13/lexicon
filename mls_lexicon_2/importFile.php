@@ -286,9 +286,10 @@ if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form']) && isse
             //echo $direc;
             lexicon_add_language($new_cols_name);
             lexicon_load($direc, 'lang', $new_cols_name);
-            echo '<script type="text/javascript">location.reload();</script>';
+            wp_redirect(esc_url_raw(add_query_arg(array('page' => 'lexicon_testing'), admin_url('admin.php'))));
         } else {
-            echo '<script type="text/javascript">alert("Your file was not succesfully uploaded");location.reload();</script>';
+            echo '<script type="text/javascript">alert("Your file was not succesfully uploaded");</script>';
+            wp_redirect(esc_url_raw(add_query_arg(array('page' => 'lexicon_testing'), admin_url('admin.php'))));
         }
     } 
 } else {
@@ -408,7 +409,6 @@ if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form']) && isse
 
         <br/> <br/>
 
-        <input type="button" onclick="backToLexicon()" class="button-secondary" value="Cancel"/>
         <input id="submit" class="button-primary" name="submit_form" type="submit" value="Submit">
     </section>
 
