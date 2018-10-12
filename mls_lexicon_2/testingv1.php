@@ -4,6 +4,37 @@
   Description: Testing
   Version: 1.0
  */
+/*
+function array2csv(array &$array) {
+    if (count($array) == 0) {
+        return null;
+    }
+    ob_start();
+    $df = fopen("php://output", 'w');
+    fputcsv($df, array_keys(reset($array)));
+    foreach ($array as $row) {
+        fputcsv($df, explode(';',$row));
+    }
+    fclose($df);
+    return ob_get_clean();
+}
+
+function download_send_headers($filename) {
+    // disable caching
+    $now = gmdate("D, d M Y H:i:s");
+    header("Expires: Tue, 03 Jul 2001 06:00:00 GMT");
+    header("Cache-Control: max-age=0, no-cache, must-revalidate, proxy-revalidate");
+    header("Last-Modified: {$now} GMT");
+
+    // force download  
+    header("Content-Type: application/force-download");
+    header("Content-Type: application/octet-stream");
+    header("Content-Type: application/download");
+
+    // disposition / encoding on response body
+    header("Content-Disposition: attachment;filename={$filename}");
+    header("Content-Transfer-Encoding: binary");
+}*/
 
 global $wpdb;
 
@@ -341,29 +372,6 @@ class Lexicon_words_List extends WP_List_Table {
             //return $theArrayResultTempA;
         }
         return $theArrayResult;
-
-        /* $columns = [
-          'code_id' => '<input type="checkbox" />',
-          'code' => __('Code', 'sp'),
-          'level' => __('Level', 'sp'),
-          't_n' => __('T_N', 'sp'),
-          'word_coexist' => __('Word Coexist', 'sp'),
-          'c_l' => __('C_L', 'sp'),
-          's_c' => __('S_C', 'sp'),
-          'g_r' => __('G_R', 'sp'),
-          'e_j' => __('E_J', 'sp'),
-          'p' => __('P', 'sp'),
-          'unit' => __('Unit', 'sp'),
-          'theme' => __('Theme', 'sp'),
-          ]; */
-
-        //$columnsPt2 = [];
-        //$columnsPt2 = testingv1_get_word_details_cols();
-        //$columns = array_merge($columns, $columnsPt2);
-        echo print_r($columns);
-        echo '<br/><br/>';
-        //echo print_r($columnsPt2);
-        return $columns;
     }
 
     public function shortLangToFull($variable) {
@@ -525,8 +533,6 @@ class Lexicon_words_List extends WP_List_Table {
 
             <div id="custom_alignleft_bulkactions_lexicon">
                 <input type="button" id="addWordId" onclick="addWord()" class="button-primary" value="Add Word">
-                <input type="button" id="importLexiconLangCSV" onclick="import_lexicon_lang_CSV()" class="button-primary" value="Import">
-                <input type="button" id="exportCsvId" onclick="exportCsv()" class="button-primary" value="Export">
             </div>
             <br class="clear" />
             <?php if ($this->has_items()): ?>
@@ -647,9 +653,45 @@ class SP_Plugin {
 
     public function plugin_menu() {
         $hook = add_menu_page(
-                'Lexicon Testing', 'Lexicon Testing', 'manage_options', 'lexicon_testing', [$this, 'plugin_settings_page']
+                'Lexicon', 'Lexicon', 'manage_options', 'lexicon_testing'
         );
+        $hook = add_submenu_page('lexicon_testing', 'Database Management', 'Database Management', 'manage_options', 'lexicon_testing', [$this, 'plugin_settings_page']);
+        add_submenu_page('lexicon_testing', 'Import/Export', 'Import/Export', 'manage_options', 'impExp', [$this, 'testingv1_impExp_page']);
         add_action("load-$hook", [$this, 'screen_option']);
+    }
+
+    public function testingv1_impExp_page() {
+        global $wpdb;
+        ?>
+
+        <br class="clear">
+
+        <div class="postbox" style="float: left; margin-left: 20px; padding: 10px;">
+            <h3>
+                <span>
+                    <?php _e('Import Data', 'mls_lexicon') ?>
+                </span>
+            </h3>
+            <div style="padding:16px; border-top: 1px solid rgba(168,151,145,0.3);">
+                <form method="post" enctype="multipart/form-data" action="">
+                    <?php include_once('importFile.php'); ?>
+                </form>
+            </div>
+        </div>
+        
+        <div class="postbox" style="float: left; margin-left: 20px; padding: 10px;">
+            <h3>
+                <span>
+                    <?php _e('Export Data', 'mls_lexicon') ?>
+                </span>
+            </h3>
+            <div style="padding:16px; border-top: 1px solid rgba(168,151,145,0.3);">
+                <?php include_once('exportFile.php')?>
+                
+            </div>
+        </div>
+
+        <?php
     }
 
     /**
@@ -675,11 +717,7 @@ class SP_Plugin {
                             <div id="lexicon-add-word">
                                 <input type="button" onclick="backToLexicon()" class="button-secondary" value="Cancel"/>
                             </div>
-                            <div id="lexicon-import-file">
-                                <form method="post" enctype="multipart/form-data" action="">
-                                    <?php include_once('importFile.php'); ?>
-                                </form>
-                            </div>
+
 
                         </div>
                     </div>
