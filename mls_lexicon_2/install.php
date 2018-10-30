@@ -7,6 +7,45 @@
 global $wpdb;
 $lexicon_db_version = "1.1";
 
+function lexicon_load_all_lang() {
+    global $wpdb;
+    $dir = str_replace("\\", "/", LEXICON_DIR) . '/lexicon_all_languages/final.csv';
+    $sqlsTemp = "";
+    //$sqls = array();
+    //load file
+    $data = file($dir);
+    //session_start();                      -->TESTING PURPOSE
+    //$_SESSION["giannakis"] = $data;       -->TESTING PURPOSE
+    $isFirst = true;
+    foreach ($data as $line) {
+        //Remove last CVC comma & new line
+        $lineTemp = rtrim($line);
+        $lineTempNew = rtrim($lineTemp, ",");
+        if ($isFirst) {
+            $isFirst = false;
+            continue;
+        }
+        $entry_data = explode(';', $lineTempNew);
+        $_SESSION["giannakis"] = $entry_data;
+        $sqlsTemp .= 'INSERT INTO ' . _LEXICON_LANGUAGES . '(id, Part2B, Part2T, Part1, Scope, Language_Type, Ref_Name, Comment) values ("' . $entry_data[0] . '" , "' . $entry_data[1] . '" , "' . $entry_data[2] . '" , "' . $entry_data[3] . '", "' . $entry_data[4] . '" , "' . $entry_data[5] . '" , "' . $entry_data[6] . '" , "' . $entry_data[7] . '");';
+    }
+    //$_SESSION["giannakis"] = $sqlsTemp;   -->TESTING PURPOSE
+    $sqls = explode(';', $sqlsTemp);
+    $error = false;
+    $wpdb->query('START TRANSACTION');
+    foreach ($sqls as $sqlQuery) {
+        if (!$wpdb->query($sqlQuery)) {
+            $error = true;
+            break;
+        }
+        if ($error) {
+            $wpdb->query('ROLLBACK');
+        } else {
+            $wpdb->query('COMMIT');
+        }
+    }
+}
+
 // Check for existing DB
 if (get_option("lexicon_db_version") == "") {
     //No db found
@@ -91,8 +130,6 @@ if (get_option("lexicon_db_version") == "") {
     // lexicon_word_details
     $sqls[] = "CREATE TABLE `" . _LEXICON_WORD_DETAILS . "`(
                                 `code_id` int unsigned NOT NULL,
-                                `word` varchar(30) NOT NULL DEFAULT '',
-                                `phrase` varchar(120),
   			        `c_l` varchar(10),
   			        `s_c` varchar(10),
   			        `g_r` varchar(10),
@@ -100,10 +137,20 @@ if (get_option("lexicon_db_version") == "") {
    			      	`p` varchar(10),
                                 `unit` varchar(10),
   			        `theme` varchar(10),
-                                `context` varchar(10),
                                 CONSTRAINT `WORD_DETAILS_FK03` FOREIGN KEY (code_id) REFERENCES " . _LEXICON_WORD_CODE . " (id)
                                 ON DELETE CASCADE
                                 ON UPDATE CASCADE
+					) DEFAULT CHARSET=utf8; ";
+    // lexicon_languages
+    $sqls[] = "CREATE TABLE `" . _LEXICON_LANGUAGES . "`(
+					`id` varchar(4) NOT NULL DEFAULT '',
+					`Part2B` varchar(10) NOT NULL DEFAULT '',
+					`Part2T` varchar(10) NOT NULL DEFAULT '',		
+					`Part1` varchar(10) NOT NULL DEFAULT '',
+					`Scope` varchar(10) NOT NULL DEFAULT '',
+					`Language_Type` varchar(10) NOT NULL DEFAULT '',		
+					`Ref_Name` varchar(50) NOT NULL DEFAULT '',
+                                        `Comment` varchar(100) NOT NULL DEFAULT ''
 					) DEFAULT CHARSET=utf8; ";
     $error = false;
     $wpdb->query('START TRANSACTION');
@@ -118,6 +165,7 @@ if (get_option("lexicon_db_version") == "") {
     if (!$error) {
         $wpdb->query('COMMIT');
         add_option("lexicon_db_version", $lexicon_db_version);
+        lexicon_load_all_lang();
     } else {
         $wpdb->query('ROLLBACK');
         echo $error;
@@ -208,8 +256,6 @@ if (get_option("lexicon_db_version") == "") {
     // lexicon_word_details
     $sqls[] = "ALTER TABLE `" . _LEXICON_WORD_DETAILS . "`
                                 MODIFY `code_id` int unsigned NOT NULL,
-                                MODIFY `word` varchar(30) NOT NULL DEFAULT '',
-                                MODIFY `phrase` varchar(120),
   			        MODIFY `c_l` varchar(10),
   			        MODIFY `s_c` varchar(10),
   			        MODIFY `g_r` varchar(10),
@@ -221,6 +267,16 @@ if (get_option("lexicon_db_version") == "") {
                                 CONSTRAINT `WORD_DETAILS_FK03` FOREIGN KEY (code_id) REFERENCES " . _LEXICON_WORD_CODE . " (id)
                                 ON DELETE CASCADE
                                 ON UPDATE CASCADE";
+    //lexicon_course
+    $sqls[] = "ALTER TABLE `" . _LEXICON_LANGUAGES . "` 
+					MODIFY `id` varchar(4) NOT NULL,
+					MODIFY `Part2B` varchar(10) NOT NULL DEFAULT '',
+					MODIFY `Part2T` varchar(10) NOT NULL DEFAULT '',		
+					MODIFY `Part1` varchar(10) NOT NULL DEFAULT '',
+					MODIFY `Scope` varchar(10) NOT NULL DEFAULT '',
+					MODIFY `Language_Type` varchar(10) NOT NULL DEFAULT '',		
+					MODIFY `Ref_Name` varchar(50) NOT NULL DEFAULT '',
+                                        MODIFY `Comment` varchar(100) NOT NULL DEFAULT ''";
     $sqls[] = "SET foreign_key_checks = 1";
 
     $error = false;
