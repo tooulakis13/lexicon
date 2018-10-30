@@ -26,6 +26,7 @@ if(get_option('testingv1_cleanup_db') == 1)
   $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}_lexicon_idioma");
   $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}lexicon_word_code");
   $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}lexicon_word_details");
+  $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}lexicon_languages");
    $wpdb->query("SET FOREIGN_KEY_CHECKS=1;");
 
   //Lexicon page is deleted
