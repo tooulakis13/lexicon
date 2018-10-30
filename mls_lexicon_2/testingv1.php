@@ -4,40 +4,10 @@
   Description: Testing
   Version: 1.0
  */
-/*
-function array2csv(array &$array) {
-    if (count($array) == 0) {
-        return null;
-    }
-    ob_start();
-    $df = fopen("php://output", 'w');
-    fputcsv($df, array_keys(reset($array)));
-    foreach ($array as $row) {
-        fputcsv($df, explode(';',$row));
-    }
-    fclose($df);
-    return ob_get_clean();
-}
-
-function download_send_headers($filename) {
-    // disable caching
-    $now = gmdate("D, d M Y H:i:s");
-    header("Expires: Tue, 03 Jul 2001 06:00:00 GMT");
-    header("Cache-Control: max-age=0, no-cache, must-revalidate, proxy-revalidate");
-    header("Last-Modified: {$now} GMT");
-
-    // force download  
-    header("Content-Type: application/force-download");
-    header("Content-Type: application/octet-stream");
-    header("Content-Type: application/download");
-
-    // disposition / encoding on response body
-    header("Content-Disposition: attachment;filename={$filename}");
-    header("Content-Transfer-Encoding: binary");
-}*/
-
+//session_start();              -->TESTING PURPOSE
+//echo $_SESSION["giannakis"];  -->TESTING PURPOSE
 global $wpdb;
-
+//console.log(var_dump($_SESSION["giannakis"]));    -->TESTING PURPOSE
 $uploads = wp_upload_dir();
 
 // Location variables
@@ -55,6 +25,7 @@ define('_LEXICON_COURSE_CODES', $wpdb->prefix . 'lexicon_course_codes');
 define('_LEXICON_WORDS', $wpdb->prefix . 'lexicon_words');
 define('_LEXICON_WORD_CODE', $wpdb->prefix . 'lexicon_word_code');
 define('_LEXICON_WORD_DETAILS', $wpdb->prefix . 'lexicon_word_details');
+define('_LEXICON_LANGUAGES', $wpdb->prefix . 'lexicon_languages');
 
 //Links to necessary files
 require_once(LEXICON_DIR . '/includes/lexicon_functions.php');
@@ -375,7 +346,18 @@ class Lexicon_words_List extends WP_List_Table {
     }
 
     public function shortLangToFull($variable) {
-        switch ($variable) {
+        
+        global $wpdb;
+        
+        $allLanguages = $wpdb->get_results("SELECT * FROM " . _LEXICON_LANGUAGES . ";");
+
+        foreach ($allLanguages as $item) {
+            switch($variable){
+                case "$item->Part1": return "$item->Ref_Name";
+            }
+        }
+        
+        /*switch ($variable) {
             case 'af': return 'Afrikaans';
             case 'sq': return 'Albanian';
             case 'am': return 'Amharic';
@@ -479,7 +461,7 @@ class Lexicon_words_List extends WP_List_Table {
             case 'yi': return 'Yiddish';
             case 'yo': return 'Yoruba';
             case 'zu': return 'Zulu';
-        }
+        }*/
     }
 
     /**
@@ -544,7 +526,6 @@ class Lexicon_words_List extends WP_List_Table {
             $this->extra_tablenav($which);
             $this->pagination($which);
             ?>
-
             <br class="clear" />
         </div>
         <?php
@@ -663,7 +644,6 @@ class SP_Plugin {
     public function testingv1_impExp_page() {
         global $wpdb;
         ?>
-
         <br class="clear">
 
         <div class="postbox" style="float: left; margin-left: 20px; padding: 10px;">
@@ -682,12 +662,24 @@ class SP_Plugin {
         <div class="postbox" style="float: left; margin-left: 20px; padding: 10px;">
             <h3>
                 <span>
+                    <?php _e('Plain Import Data', 'mls_lexicon') ?>
+                </span>
+            </h3>
+            <div style="padding:16px; border-top: 1px solid rgba(168,151,145,0.3);">
+                <form method="post" enctype="multipart/form-data" action="">
+                    <?php include_once('plainLangImport.php'); ?>
+                </form>
+            </div>
+        </div>
+        
+        <div class="postbox" style="float: left; margin-left: 20px; padding: 10px;">
+            <h3>
+                <span>
                     <?php _e('Export Data', 'mls_lexicon') ?>
                 </span>
             </h3>
             <div style="padding:16px; border-top: 1px solid rgba(168,151,145,0.3);">
                 <?php include_once('exportFile.php')?>
-                
             </div>
         </div>
 
