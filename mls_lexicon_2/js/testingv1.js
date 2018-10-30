@@ -183,3 +183,18 @@ function export_data_to_CSV(iterNum) {
         }
     }
 }
+
+function showMoreLanguages(response) {
+    var theLessLangData = document.getElementById("lessOpt").value;
+    var theMoreLangData = document.getElementById("moreOpt").value;
+    
+    if(response === true){
+        document.getElementById("theLanguagesOptions").innerHTML = theMoreLangData;
+        document.getElementById("showLanguagesLink").innerHTML = '<a href="#" onclick="showMoreLanguages(false)">Need less languages?</a>';
+    }else if(response === false){
+        document.getElementById("theLanguagesOptions").innerHTML = theLessLangData;
+        document.getElementById("showLanguagesLink").innerHTML = '<a href="#" onclick="showMoreLanguages(true)">Need more languages?</a>';
+    }
+    
+    //document.getElementById("sectionImportLang").innerHTML;
+}
