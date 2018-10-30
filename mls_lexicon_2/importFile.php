@@ -1,5 +1,4 @@
 <?php
-
 $kv_errors = array();
 
 function lexicon_load($dir, $type, $cols_to_add) {
@@ -43,6 +42,7 @@ function lexiconSingleBit2Three($param) {
 
 function lexicon_load_lang($dir, $lang_name, $cols_to_add) {
     global $wpdb;
+    $databaseName = $wpdb->dbname;
     $absolutepath = $dir . $lang_name;
     echo $absolutepath;
     $sqlsTemp = "";
@@ -50,6 +50,11 @@ function lexicon_load_lang($dir, $lang_name, $cols_to_add) {
     //load file
     $data = file($absolutepath);
     $isFirst = true;
+    $cols_to_add_word = $cols_to_add . '_word';
+    $cols_to_add_phrase = $cols_to_add . '_phrase';
+    $languageExistCheck = $wpdb->get_results("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='$databaseName' AND TABLE_NAME='" . _LEXICON_WORD_DETAILS . "' and (column_name='$cols_to_add_word' or column_name='$cols_to_add_phrase');");
+    lexicon_add_language($cols_to_add);
+    //echo print_r($languageExistCheck);
     foreach ($data as $line) {
         //Remove last CVC comma & new line
         $lineTemp = rtrim($line);
@@ -92,9 +97,6 @@ function lexicon_load_lang($dir, $lang_name, $cols_to_add) {
         $file_word_ej = lexiconSingleBit2Two($file_word_ej);
         $file_word_p = lexiconSingleBit2Three($file_word_p);
 
-        $cols_to_add_word = $cols_to_add . '_word';
-        $cols_to_add_phrase = $cols_to_add . '_phrase';
-
         //FIRST TIME UPLOADING
 
         if ($file_word_word != '') {
@@ -109,8 +111,6 @@ function lexicon_load_lang($dir, $lang_name, $cols_to_add) {
             $phrase_digit = '0';
         }
 
-        $file_word_coexist = $word_digit . $phrase_digit;
-
         $file_word_code = $file_word_cl . $file_word_sc . $file_word_gr . $file_word_ej . $file_word_p;
 
         $result = $wpdb->get_results('SELECT * FROM ' . _LEXICON_WORD_CODE . ' WHERE id IS NOT NULL');
@@ -119,13 +119,25 @@ function lexicon_load_lang($dir, $lang_name, $cols_to_add) {
 
         if (count($result) == 0) {
             //>>>QUERY USED FOR THE FIRST IMPORTED FILE<<<
+            $file_word_coexist = $word_digit . $phrase_digit;
             $sqlsTemp .= 'INSERT INTO ' . _LEXICON_WORD_CODE . '(id, code, level, t_n, word_coexist) values ("' . $file_word_id . '" , "' . $file_word_code . '"  , "' . $file_word_level . '"  , "' . $file_word_tn . '"  , "' . $file_word_coexist . '");'
                     . 'INSERT INTO ' . _LEXICON_WORD_DETAILS . '(code_id, c_l, s_c, g_r, e_j, p, unit, theme, ' . $cols_to_add_word . ', ' . $cols_to_add_phrase . ') values ("' . $file_word_id . '" , "' . $file_word_cl . '"  , "' . $file_word_sc . '"  , "' . $file_word_gr . '"  , "' . $file_word_ej . '"  , "' . $file_word_p . '"  , "' . $file_word_unit . '"  , "' . $file_word_theme . '" , "' . $file_word_word . '" , "' . $file_word_phrase . '");';
-        } else if (count($result) != 0 && count($checkIdExist) == 1) {
-            //>>>QUERY USED FOR THE REST OF THE FILES IN CASE THERE ARE NO NEW WORDS IN THE CSV FILE<<<
+        } else if (count($result) != 0 && count($checkIdExist) == 1 && !$languageExistCheck) {
+            //>>>QUERY USED FOR THE REST OF THE FILES IN CASE THERE ARE NO NEW WORDS IN THE CSV FILE AND THE LANGUAGE DOES NOT ALREADY EXIST<<<
+            //>>>NOT DONE YET - PREPI NA KAMW TO FUNCTION GIA TO WORD COEXIST
+            $wordCoExistTemp = $wpdb->get_results('SELECT word_coexist FROM ' . _LEXICON_WORD_CODE . ' WHERE id = ' . $file_word_id . ' LIMIT 1');
+            //echo print_r($wordCoExistTemp);
+            $wordCoExistTempValue = $wordCoExistTemp[0]->word_coexist;
+            $file_word_coexist = $wordCoExistTempValue . $word_digit . $phrase_digit;
+            $sqlsTemp .= 'UPDATE ' . _LEXICON_WORD_DETAILS . ' SET ' . $cols_to_add_word . ' = "' . $file_word_word . '", ' . $cols_to_add_phrase . ' = "' . $file_word_phrase . '" WHERE code_id = ' . $file_word_id . ';'
+                    . 'UPDATE ' . _LEXICON_WORD_CODE . ' SET word_coexist = "' . $file_word_coexist . '" WHERE id = ' . $file_word_id . ';';
+        } else if (count($result) != 0 && count($checkIdExist) == 1 && $languageExistCheck) {
+            //>>>QUERY USED FOR THE REST OF THE FILES IN CASE THERE ARE NO NEW WORDS IN THE CSV FILE AND THE LANGUAGE ALREADY EXIST<<<
+            //>>>NOT DONE YET - PREPI NA KAMW TO FUNCTION GIA TO WORD COEXIST
             $sqlsTemp .= 'UPDATE ' . _LEXICON_WORD_DETAILS . ' SET ' . $cols_to_add_word . ' = "' . $file_word_word . '", ' . $cols_to_add_phrase . ' = "' . $file_word_phrase . '" WHERE code_id = ' . $file_word_id . ';';
         } else if (count($result) != 0 && count($checkIdExist) == 0) {
             //>>>QUERY USED FOR THE REST OF THE FILES IN CASE THERE ARE NEW WORDS IN THE CSV FILE<<<
+            $file_word_coexist .= $word_digit . $phrase_digit;
             $sqlsTemp .= 'INSERT INTO ' . _LEXICON_WORD_CODE . '(id, code, level, t_n, word_coexist) values ("' . $file_word_id . '" , "' . $file_word_code . '"  , "' . $file_word_level . '"  , "' . $file_word_tn . '"  , "' . $file_word_coexist . '");'
                     . 'INSERT INTO ' . _LEXICON_WORD_DETAILS . '(code_id, c_l, s_c, g_r, e_j, p, unit, theme, ' . $cols_to_add_word . ', ' . $cols_to_add_phrase . ') values ("' . $file_word_id . '" , "' . $file_word_cl . '"  , "' . $file_word_sc . '"  , "' . $file_word_gr . '"  , "' . $file_word_ej . '"  , "' . $file_word_p . '"  , "' . $file_word_unit . '"  , "' . $file_word_theme . '" , "' . $file_word_word . '" , "' . $file_word_phrase . '");';
         }
@@ -156,39 +168,6 @@ function lexicon_add_language($cols_to_add) {
 
     $cols_to_add_word = $cols_to_add . '_word';
     $cols_to_add_phrase = $cols_to_add . '_phrase';
-
-    $testingv1_languages_for_get_columns = "";
-    $testingv1_languages_for_column_default = "";
-
-    $testingv1_languages_for_get_columns = [
-        "'$cols_to_add_word'" => __("'$cols_to_add word'", 'sp'),
-        "'$cols_to_add_phrase'" => __("'$cols_to_add phrase'", 'sp'),
-    ];
-
-
-
-    //echo print_r($testingv1_languages_for_get_columns);
-
-    /* $filename = 'lexiconColumns.txt';
-
-      if (file_exists($filename)) {
-      file_put_contents(LEXICON_DIR . "\lexiconColumns.txt", $testingv1_languages_for_get_columns, FILE_APPEND);
-      } else {
-      file_put_contents(LEXICON_DIR . "\lexiconColumns.txt", $testingv1_languages_for_get_columns, FILE_APPEND);
-      } */
-
-    //echo LEXICON_DIR;
-
-    $testingv1_languages_for_column_default .= "case '" . $cols_to_add_word . "':
-            case '" . $cols_to_add_phrase . "':";
-
-    if ($testingv1_languages_for_get_columns != "" && $testingv1_languages_for_column_default != "") {
-        $LEXICON_LANGUAGES_FOR_GET_COLUMNS = $testingv1_languages_for_get_columns;
-        $LEXICON_LANGUAGES_FOR_COLUMN_DEFAULT = $testingv1_languages_for_column_default;
-    } else {
-        $LEXICON_LANGUAGES_FOR_GET_COLUMNS = "hello";
-        $LEXICON_LANGUAGES_FOR_COLUMN_DEFAULT = "hello";
-    }
 
     echo '<br/>';
     //echo $LEXICON_LANGUAGES_FOR_GET_COLUMNS;
@@ -259,8 +238,6 @@ if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form']) && isse
 
         $new_cols_name = $_POST['lex_lang'];
 
-        
-        //mysql_query("ALTER TABLE birthdays ADD street CHAR(30)");
         //testingv1_get_word_details_cols();
 
         $uploadedfile = $_FILES['lexicon_file_to_upload'];
@@ -284,126 +261,50 @@ if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form']) && isse
             define('LEXICON_FILE_TO_REMOVE', $new_dir);
             $direc = substr($new_dir, 0, -$lex_tempfile_name_length);
             //echo $direc;
-            lexicon_add_language($new_cols_name);
+
             lexicon_load($direc, 'lang', $new_cols_name);
-            wp_redirect(esc_url_raw(add_query_arg(array('page' => 'lexicon_testing'), admin_url('admin.php'))));
+            //wp_redirect(esc_url_raw(add_query_arg(array('page' => 'lexicon_testing'), admin_url('admin.php'))));
         } else {
             echo '<script type="text/javascript">alert("Your file was not succesfully uploaded");</script>';
-            wp_redirect(esc_url_raw(add_query_arg(array('page' => 'lexicon_testing'), admin_url('admin.php'))));
+            //wp_redirect(esc_url_raw(add_query_arg(array('page' => 'lexicon_testing'), admin_url('admin.php'))));
         }
-    } 
+    }
 } else {
-    ?>
-    <section>
-        <label>Language: </label>
 
-        <select name="lex_lang">  
-            <option value=af>Afrikaans</option>
-            <option value=sq>Albanian</option>
-            <option value=am>Amharic</option>
-            <option value=ar>Arabic</option>
-            <option value=hy>Armenian</option>
-            <option value=az>Azerbaijani</option>
-            <option value=eu>Basque</option>
-            <option value=be>Belarusian</option>
-            <option value=bn>Bengali</option>
-            <option value=bs>Bosnian</option>
-            <option value=bg>Bulgarian</option>
-            <option value=ca>Catalan</option>
-            <option value=ceb>Cebuano</option>
-            <option value=ny>Chichewa</option>
-            <option value=zh-CN>Chinese</option>
-            <option value=co>Corsican</option>
-            <option value=hr>Croatian</option>
-            <option value=cs>Czech</option>
-            <option value=da>Danish</option>
-            <option value=nl>Dutch</option>
-            <option value=en>English</option>
-            <option value=eo>Esperanto</option>
-            <option value=et>Estonian</option>
-            <option value=tl>Filipino</option>
-            <option value=fi>Finnish</option>
-            <option value=fr>French</option>
-            <option value=fy>Frisian</option>
-            <option value=gl>Galician</option>
-            <option value=ka>Georgian</option>
-            <option value=de>German</option>
-            <option value=el>Greek</option>
-            <option value=gu>Gujarati</option>
-            <option value=ht>Haitian Creole</option>
-            <option value=ha>Hausa</option>
-            <option value=haw>Hawaiian</option>
-            <option value=iw>Hebrew</option>
-            <option value=hi>Hindi</option>
-            <option value=hmn>Hmong</option>
-            <option value=hu>Hungarian</option>
-            <option value=is>Icelandic</option>
-            <option value=ig>Igbo</option>
-            <option value=id>Indonesian</option>
-            <option value=ga>Irish</option>
-            <option value=it>Italian</option>
-            <option value=ja>Japanese</option>
-            <option value=jw>Javanese</option>
-            <option value=kn>Kannada</option>
-            <option value=kk>Kazakh</option>
-            <option value=km>Khmer</option>
-            <option value=ko>Korean</option>
-            <option value=ku>Kurdish (Kurmanji)</option>
-            <option value=ky>Kyrgyz</option>
-            <option value=lo>Lao</option>
-            <option value=la>Latin</option>
-            <option value=lv>Latvian</option>
-            <option value=lt>Lithuanian</option>
-            <option value=lb>Luxembourgish</option>
-            <option value=mk>Macedonian</option>
-            <option value=mg>Malagasy</option>
-            <option value=ms>Malay</option>
-            <option value=ml>Malayalam</option>
-            <option value=mt>Maltese</option>
-            <option value=mi>Maori</option>
-            <option value=mr>Marathi</option>
-            <option value=mn>Mongolian</option>
-            <option value=my>Myanmar (Burmese)</option>
-            <option value=ne>Nepali</option>
-            <option value=no>Norwegian</option>
-            <option value=ps>Pashto</option>
-            <option value=fa>Persian</option>
-            <option value=pl>Polish</option>
-            <option value=pt>Portuguese</option>
-            <option value=pa>Punjabi</option>
-            <option value=ro>Romanian</option>
-            <option value=ru>Russian</option>
-            <option value=sm>Samoan</option>
-            <option value=gd>Scots Gaelic</option>
-            <option value=sr>Serbian</option>
-            <option value=st>Sesotho</option>
-            <option value=sn>Shona</option>
-            <option value=sd>Sindhi</option>
-            <option value=si>Sinhala</option>
-            <option value=sk>Slovak</option>
-            <option value=sl>Slovenian</option>
-            <option value=so>Somali</option>
-            <option value=es>Spanish</option>
-            <option value=su>Sundanese</option>
-            <option value=sw>Swahili</option>
-            <option value=sv>Swedish</option>
-            <option value=tg>Tajik</option>
-            <option value=ta>Tamil</option>
-            <option value=te>Telugu</option>
-            <option value=th>Thai</option>
-            <option value=tr>Turkish</option>
-            <option value=uk>Ukrainian</option>
-            <option value=ur>Urdu</option>
-            <option value=uz>Uzbek</option>
-            <option value=vi>Vietnamese</option>
-            <option value=cy>Welsh</option>
-            <option value=xh>Xhosa</option>
-            <option value=yi>Yiddish</option>
-            <option value=yo>Yoruba</option>
-            <option value=zu>Zulu</option>
+    $twoLetterLivingLanguages = $wpdb->get_results("SELECT * FROM " . _LEXICON_LANGUAGES . " WHERE Part1 <> '' AND Language_Type = 'L';");
+    //print_r($twoLetterLivingLanguages);
+    $smallLangList = ['es', 'cs', 'da', 'de', 'et', 'el', 'en', 'fr', 'ga', 'hr', 'it', 'lv', 'lt', 'hu', 'mt', 'nl', 'pl', 'pt', 'ro', 'sk', 'sl', 'fi', 'sv'];
+
+    $moreLanguagesOption = '';
+    $lessLanguagesOption = '';
+    foreach ($twoLetterLivingLanguages as $langTable) {
+        $moreLanguagesOption .= "<option value=" . "$langTable->Part1" . ">" . "$langTable->Ref_Name" . "</option>";
+    }
+
+    foreach ($twoLetterLivingLanguages as $langTable) {
+        if (in_array($langTable->Part1, $smallLangList)) {
+            $lessLanguagesOption .= "<option value=" . "$langTable->Part1" . ">" . "$langTable->Ref_Name" . "</option>";
+        }
+    }
+    ?>
+    <input type="hidden" value="<?php echo $moreLanguagesOption ?>" id="moreOpt"/>
+    <input type="hidden" value="<?php echo $lessLanguagesOption ?>" id="lessOpt"/>
+    <section id="sectionImportLang">
+        <label>Language: </label>
+        <?php //echo var_dump($lessLanguagesOption); ?>
+        <select name="lex_lang" id="theLanguagesOptions">
+            <?php
+            echo $lessLanguagesOption;
+            ?>
         </select>
 
-        <br/> <br/>
+        <br/>
+        <br/>
+        <div id="showLanguagesLink">
+            <a href="#" onclick="showMoreLanguages(true)">Need more languages?</a>
+        </div>
+        <br/>
+        <br/>
 
         <input type="file" name="lexicon_file_to_upload" id="lexicon_file_to_upload_id" />
 
@@ -413,5 +314,4 @@ if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form']) && isse
     </section>
 
     <?php
-
 }
