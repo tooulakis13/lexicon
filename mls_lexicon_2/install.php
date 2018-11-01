@@ -14,9 +14,10 @@ function lexicon_load_all_lang() {
     //$sqls = array();
     //load file
     $data = file($dir);
-    //session_start();                      -->TESTING PURPOSE
+    //session_start();
     //$_SESSION["giannakis"] = $data;       -->TESTING PURPOSE
     $isFirst = true;
+    $countEntries = 0;
     foreach ($data as $line) {
         //Remove last CVC comma & new line
         $lineTemp = rtrim($line);
@@ -26,14 +27,20 @@ function lexicon_load_all_lang() {
             continue;
         }
         $entry_data = explode(';', $lineTempNew);
-        $_SESSION["giannakis"] = $entry_data;
+        //$_SESSION["giannakis"] = $entry_data;
         $sqlsTemp .= 'INSERT INTO ' . _LEXICON_LANGUAGES . '(id, Part2B, Part2T, Part1, Scope, Language_Type, Ref_Name, Comment) values ("' . $entry_data[0] . '" , "' . $entry_data[1] . '" , "' . $entry_data[2] . '" , "' . $entry_data[3] . '", "' . $entry_data[4] . '" , "' . $entry_data[5] . '" , "' . $entry_data[6] . '" , "' . $entry_data[7] . '");';
+        $countEntries++;
     }
     //$_SESSION["giannakis"] = $sqlsTemp;   -->TESTING PURPOSE
     $sqls = explode(';', $sqlsTemp);
+    $countIter = count($sqls);
     $error = false;
     $wpdb->query('START TRANSACTION');
+    //$_SESSION["giannakis"] = $countIter;
     foreach ($sqls as $sqlQuery) {
+        if (--$countIter <= 0) {
+            break;
+        }
         if (!$wpdb->query($sqlQuery)) {
             $error = true;
             break;
@@ -44,6 +51,24 @@ function lexicon_load_all_lang() {
             $wpdb->query('COMMIT');
         }
     }
+    testingv1_assign_nums();
+}
+
+function testingv1_assign_nums() {
+    global $wpdb;
+    //$langNumRelation = array();
+    $allLanguages = $wpdb->get_results("SELECT * FROM " . _LEXICON_LANGUAGES . ";");
+    $counter = 0;
+    session_start();
+    foreach ($allLanguages as $language) {
+        $languageId = $language->id;
+        $langNumRelation["$languageId"] = array("All" => $counter, 
+                                              "Untranslated" => $counter + 1, 
+                                              "Waiting" => $counter + 2, 
+                                              "Fuzzy" => $counter + 3);
+        $counter = $counter + 10;
+    }
+    $_SESSION["giannakis"] = $langNumRelation;
 }
 
 // Check for existing DB
@@ -164,8 +189,8 @@ if (get_option("lexicon_db_version") == "") {
 
     if (!$error) {
         $wpdb->query('COMMIT');
-        add_option("lexicon_db_version", $lexicon_db_version);
         lexicon_load_all_lang();
+        add_option("lexicon_db_version", $lexicon_db_version);
     } else {
         $wpdb->query('ROLLBACK');
         echo $error;
@@ -174,35 +199,33 @@ if (get_option("lexicon_db_version") == "") {
     // DB version outdated
 
     $sqls = Array();
-    $sqls[] = "SET foreign_key_checks = 0";
+    //$sqls[] = "SET foreign_key_checks = 0";
     //lexicon_course
+    $sqls[] = "ALTER TABLE `" . _LEXICON_COURSE . "` DROP PRIMARY KEY";
     $sqls[] = "ALTER TABLE `" . _LEXICON_COURSE . "` 
 					MODIFY `id` int unsigned NOT NULL auto_increment,
 					MODIFY `lang_1` varchar(30) NOT NULL DEFAULT '',
 					MODIFY `lang_2` varchar(30) NOT NULL DEFAULT '',		
 					MODIFY `level` varchar(10) NOT NULL DEFAULT '',
 					MODIFY `description` varchar(255),
-					DROP PRIMARY KEY,
 					ADD PRIMARY KEY (id)";
     //lexicon_course_student
+    $sqls[] = "ALTER TABLE `" . _LEXICON_COURSE_STUDENT . "` DROP PRIMARY KEY, DROP FOREIGN KEY `COURSE_STUDENT_FK01`";
     $sqls[] = "ALTER TABLE `" . _LEXICON_COURSE_STUDENT . "`
 					MODIFY `student_id` bigint(20) NOT NULL DEFAULT 0,
 					MODIFY `course_id` int unsigned NOT NULL DEFAULT 0,
 					MODIFY `state` int unsigned NOT NULL DEFAULT 0,
-					DROP PRIMARY KEY,
                                         ADD PRIMARY KEY (student_id, course_id),
-					DROP FOREIGN KEY `COURSE_STUDENT_FK01`,
 					CONSTRAINT `COURSE_STUDENT_FK01` FOREIGN KEY (course_id) REFERENCES " . _LEXICON_COURSE . " (id)
                                         ON DELETE CASCADE
                                         ON UPDATE CASCADE";
     // lexicon_course_student_card
+    $sqls[] = "ALTER TABLE `" . _LEXICON_COURSE_SUTDENT_CARD . "` DROP FOREIGN KEY `COURSE_STUDENT_CARD FK01`, DROP FOREIGN KEY `COURSE_STUDENT_CARD FK02`";
     $sqls[] = "ALTER TABLE `" . _LEXICON_COURSE_SUTDENT_CARD . "`
 					MODIFY `student_id` bigint(20) NOT NULL DEFAULT 0,
 					MODIFY `course_id` int unsigned NOT NULL DEFAULT 0,
 					MODIFY `code` varchar(16) NOT NULL DEFAULT '',
 					MODIFY `prog_level` int unsigned NOT NULL DEFAULT 0,
-					DROP FOREIGN KEY `COURSE_STUDENT_CARD FK02`,
-					DROP FOREIGN KEY `COURSE_STUDENT_CARD FK02`,
 					CONSTRAINT `COURSE_STUDENT_CARD_FK01` FOREIGN KEY (student_id) REFERENCES " . _LEXICON_COURSE_STUDENT . " (student_id)
                                         ON DELETE CASCADE
                                         ON UPDATE CASCADE,
@@ -210,19 +233,20 @@ if (get_option("lexicon_db_version") == "") {
                                         ON DELETE CASCADE
                                         ON UPDATE CASCADE";
     // lexicon_course_author
+    $sqls[] = "ALTER TABLE `" . _LEXICON_COURSE_AUTHOR . "` DROP PRIMARY KEY";
     $sqls[] = "ALTER TABLE `" . _LEXICON_COURSE_AUTHOR . "`
 					MODIFY `teacher_id` bigint(20) NOT NULL DEFAULT 0,
-					MODIFY `course_id` int unsigned NOT NULL DEFAULT 0,	
-					DROP PRIMARY KEY,								
+					MODIFY `course_id` int unsigned NOT NULL DEFAULT 0,								
 					ADD PRIMARY KEY (teacher_id, course_id)";
     // lexicon_course_codes
+    $sqls[] = "ALTER TABLE `" . _LEXICON_COURSE_CODES . "` DROP PRIMARY KEY";
     $sqls[] = "ALTER TABLE `" . _LEXICON_COURSE_CODES . "`
 					MODIFY `course_id` int unsigned NOT NULL DEFAULT 0,
 					MODIFY `code` varchar(16) NOT NULL DEFAULT '',
                                         MODIFY `context` varchar(120),
-		  			DROP PRIMARY KEY,
 					ADD PRIMARY KEY (course_id, code)";
-    // lexicon_words	
+    // lexicon_words
+    $sqls[] = "ALTER TABLE `" . _LEXICON_WORDS . "` DROP PRIMARY KEY";
     $sqls[] = "ALTER TABLE `" . _LEXICON_WORDS . "`
 					MODIFY `id` int unsigned NOT NULL auto_increment,
 					MODIFY `code` varchar(16) NOT NULL DEFAULT '',
@@ -242,18 +266,18 @@ if (get_option("lexicon_db_version") == "") {
                                         MODIFY `column_15` varchar(10) NOT NULL DEFAULT '',
                                         MODIFY `column_16` varchar(10) NOT NULL DEFAULT '',
                                         MODIFY `lang` varchar(30) NOT NULL DEFAULT '',
-					DROP PRIMARY KEY,
 				  	ADD PRIMARY KEY (id)";
     // lexicon_word_code
+    $sqls[] = "ALTER TABLE `" . _LEXICON_WORD_CODE . "` DROP PRIMARY KEY";
     $sqls[] = "ALTER TABLE `" . _LEXICON_WORD_CODE . "`
                                 MODIFY `id` int unsigned NOT NULL,
                                 MODIFY `code` varchar(16) NOT NULL DEFAULT '',
   			        MODIFY `level` varchar(10) NOT NULL DEFAULT '',
                                 MODIFY `t_n` varchar(16) NOT NULL DEFAULT '',
-                                MODIFY `word_coexist` varchar(80) NOT NULL DEFAULT ''
-                                DROP PRIMARY KEY,
+                                MODIFY `word_coexist` varchar(80) NOT NULL DEFAULT '',
 				ADD PRIMARY KEY (id)";
     // lexicon_word_details
+    $sqls[] = "ALTER TABLE `" . _LEXICON_WORD_DETAILS . "` DROP FOREIGN KEY `WORD_DETAILS FK03`";
     $sqls[] = "ALTER TABLE `" . _LEXICON_WORD_DETAILS . "`
                                 MODIFY `code_id` int unsigned NOT NULL,
   			        MODIFY `c_l` varchar(10),
@@ -277,7 +301,7 @@ if (get_option("lexicon_db_version") == "") {
 					MODIFY `Language_Type` varchar(10) NOT NULL DEFAULT '',		
 					MODIFY `Ref_Name` varchar(50) NOT NULL DEFAULT '',
                                         MODIFY `Comment` varchar(100) NOT NULL DEFAULT ''";
-    $sqls[] = "SET foreign_key_checks = 1";
+    //$sqls[] = "SET foreign_key_checks = 1";
 
     $error = false;
     $wpdb->query('START TRANSACTION');
