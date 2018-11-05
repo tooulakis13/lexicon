@@ -51,24 +51,6 @@ function lexicon_load_all_lang() {
             $wpdb->query('COMMIT');
         }
     }
-    testingv1_assign_nums();
-}
-
-function testingv1_assign_nums() {
-    global $wpdb;
-    //$langNumRelation = array();
-    $allLanguages = $wpdb->get_results("SELECT * FROM " . _LEXICON_LANGUAGES . ";");
-    $counter = 0;
-    session_start();
-    foreach ($allLanguages as $language) {
-        $languageId = $language->id;
-        $langNumRelation["$languageId"] = array("All" => $counter, 
-                                              "Untranslated" => $counter + 1, 
-                                              "Waiting" => $counter + 2, 
-                                              "Fuzzy" => $counter + 3);
-        $counter = $counter + 10;
-    }
-    $_SESSION["giannakis"] = $langNumRelation;
 }
 
 // Check for existing DB
