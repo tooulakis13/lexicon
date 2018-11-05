@@ -4,10 +4,10 @@
   Description: Testing
   Version: 1.0
  */
-//session_start();              -->TESTING PURPOSE
+//session_start();              
 //echo $_SESSION["giannakis"];  -->TESTING PURPOSE
 global $wpdb;
-//console.log(var_dump($_SESSION["giannakis"]));    -->TESTING PURPOSE
+//console.log(var_dump($_SESSION["giannakis"]));
 $uploads = wp_upload_dir();
 
 // Location variables
@@ -346,122 +346,122 @@ class Lexicon_words_List extends WP_List_Table {
     }
 
     public function shortLangToFull($variable) {
-        
+
         global $wpdb;
-        
+
         $allLanguages = $wpdb->get_results("SELECT * FROM " . _LEXICON_LANGUAGES . ";");
 
         foreach ($allLanguages as $item) {
-            switch($variable){
+            switch ($variable) {
                 case "$item->Part1": return "$item->Ref_Name";
             }
         }
-        
-        /*switch ($variable) {
-            case 'af': return 'Afrikaans';
-            case 'sq': return 'Albanian';
-            case 'am': return 'Amharic';
-            case 'ar': return 'Arabic';
-            case 'hy': return 'Armenian';
-            case 'az': return 'Azerbaijani';
-            case 'eu': return 'Basque';
-            case 'be': return 'Belarusian';
-            case 'bn': return 'Bengali';
-            case 'bs': return 'Bosnian';
-            case 'bg': return 'Bulgarian';
-            case 'ca': return 'Catalan';
-            case 'ce': return 'Cebuano';
-            case 'ny': return 'Chichewa';
-            case 'zh-CN': return 'Chinese';
-            case 'co': return 'Corsican';
-            case 'hr': return 'Croatian';
-            case 'cs': return 'Czech';
-            case 'da': return 'Danish';
-            case 'nl': return 'Dutch';
-            case 'en': return 'English';
-            case 'eo': return 'Esperanto';
-            case 'et': return 'Estonian';
-            case 'tl': return 'Filipino';
-            case 'fi': return 'Finnish';
-            case 'fr': return 'French';
-            case 'fy': return 'Frisian';
-            case 'gl': return 'Galician';
-            case 'ka': return 'Georgian';
-            case 'de': return 'German';
-            case 'el': return 'Greek';
-            case 'gu': return 'Gujarati';
-            case 'ht': return 'Haitian Creole';
-            case 'ha': return 'Hausa';
-            case 'haw': return 'Hawaiian';
-            case 'iw': return 'Hebrew';
-            case 'hi': return 'Hindi';
-            case 'hmn': return 'Hmong';
-            case 'hu': return 'Hungarian';
-            case 'is': return 'Icelandic';
-            case 'ig': return 'Igbo';
-            case 'id': return 'Indonesian';
-            case 'ga': return 'Irish';
-            case 'it': return 'Italian';
-            case 'ja': return 'Japanese';
-            case 'jw': return 'Javanese';
-            case 'kn': return 'Kannada';
-            case 'kk': return 'Kazakh';
-            case 'km': return 'Khmer';
-            case 'ko': return 'Korean';
-            case 'ku': return 'Kurdish (Kurmanji)';
-            case 'ky': return 'Kyrgyz';
-            case 'lo': return 'Lao';
-            case 'la': return 'Latin';
-            case 'lv': return 'Latvian';
-            case 'lt': return 'Lithuanian';
-            case 'lb': return 'Luxembourgish';
-            case 'mk': return 'Macedonian';
-            case 'mg': return 'Malagasy';
-            case 'ms': return 'Malay';
-            case 'ml': return 'Malayalam';
-            case 'mt': return 'Maltese';
-            case 'mi': return 'Maori';
-            case 'mr': return 'Marathi';
-            case 'mn': return 'Mongolian';
-            case 'my': return 'Myanmar (Burmese)';
-            case 'ne': return 'Nepali';
-            case 'no': return 'Norwegian';
-            case 'ps': return 'Pashto';
-            case 'fa': return 'Persian';
-            case 'pl': return 'Polish';
-            case 'pt': return 'Portuguese';
-            case 'pa': return 'Punjabi';
-            case 'ro': return 'Romanian';
-            case 'ru': return 'Russian';
-            case 'sm': return 'Samoan';
-            case 'gd': return 'Scots Gaelic';
-            case 'sr': return 'Serbian';
-            case 'st': return 'Sesotho';
-            case 'sn': return 'Shona';
-            case 'sd': return 'Sindhi';
-            case 'si': return 'Sinhala';
-            case 'sk': return 'Slovak';
-            case 'sl': return 'Slovenian';
-            case 'so': return 'Somali';
-            case 'es': return 'Spanish';
-            case 'su': return 'Sundanese';
-            case 'sw': return 'Swahili';
-            case 'sv': return 'Swedish';
-            case 'tg': return 'Tajik';
-            case 'ta': return 'Tamil';
-            case 'te': return 'Telugu';
-            case 'th': return 'Thai';
-            case 'tr': return 'Turkish';
-            case 'uk': return 'Ukrainian';
-            case 'ur': return 'Urdu';
-            case 'uz': return 'Uzbek';
-            case 'vi': return 'Vietnamese';
-            case 'cy': return 'Welsh';
-            case 'xh': return 'Xhosa';
-            case 'yi': return 'Yiddish';
-            case 'yo': return 'Yoruba';
-            case 'zu': return 'Zulu';
-        }*/
+
+        /* switch ($variable) {
+          case 'af': return 'Afrikaans';
+          case 'sq': return 'Albanian';
+          case 'am': return 'Amharic';
+          case 'ar': return 'Arabic';
+          case 'hy': return 'Armenian';
+          case 'az': return 'Azerbaijani';
+          case 'eu': return 'Basque';
+          case 'be': return 'Belarusian';
+          case 'bn': return 'Bengali';
+          case 'bs': return 'Bosnian';
+          case 'bg': return 'Bulgarian';
+          case 'ca': return 'Catalan';
+          case 'ce': return 'Cebuano';
+          case 'ny': return 'Chichewa';
+          case 'zh-CN': return 'Chinese';
+          case 'co': return 'Corsican';
+          case 'hr': return 'Croatian';
+          case 'cs': return 'Czech';
+          case 'da': return 'Danish';
+          case 'nl': return 'Dutch';
+          case 'en': return 'English';
+          case 'eo': return 'Esperanto';
+          case 'et': return 'Estonian';
+          case 'tl': return 'Filipino';
+          case 'fi': return 'Finnish';
+          case 'fr': return 'French';
+          case 'fy': return 'Frisian';
+          case 'gl': return 'Galician';
+          case 'ka': return 'Georgian';
+          case 'de': return 'German';
+          case 'el': return 'Greek';
+          case 'gu': return 'Gujarati';
+          case 'ht': return 'Haitian Creole';
+          case 'ha': return 'Hausa';
+          case 'haw': return 'Hawaiian';
+          case 'iw': return 'Hebrew';
+          case 'hi': return 'Hindi';
+          case 'hmn': return 'Hmong';
+          case 'hu': return 'Hungarian';
+          case 'is': return 'Icelandic';
+          case 'ig': return 'Igbo';
+          case 'id': return 'Indonesian';
+          case 'ga': return 'Irish';
+          case 'it': return 'Italian';
+          case 'ja': return 'Japanese';
+          case 'jw': return 'Javanese';
+          case 'kn': return 'Kannada';
+          case 'kk': return 'Kazakh';
+          case 'km': return 'Khmer';
+          case 'ko': return 'Korean';
+          case 'ku': return 'Kurdish (Kurmanji)';
+          case 'ky': return 'Kyrgyz';
+          case 'lo': return 'Lao';
+          case 'la': return 'Latin';
+          case 'lv': return 'Latvian';
+          case 'lt': return 'Lithuanian';
+          case 'lb': return 'Luxembourgish';
+          case 'mk': return 'Macedonian';
+          case 'mg': return 'Malagasy';
+          case 'ms': return 'Malay';
+          case 'ml': return 'Malayalam';
+          case 'mt': return 'Maltese';
+          case 'mi': return 'Maori';
+          case 'mr': return 'Marathi';
+          case 'mn': return 'Mongolian';
+          case 'my': return 'Myanmar (Burmese)';
+          case 'ne': return 'Nepali';
+          case 'no': return 'Norwegian';
+          case 'ps': return 'Pashto';
+          case 'fa': return 'Persian';
+          case 'pl': return 'Polish';
+          case 'pt': return 'Portuguese';
+          case 'pa': return 'Punjabi';
+          case 'ro': return 'Romanian';
+          case 'ru': return 'Russian';
+          case 'sm': return 'Samoan';
+          case 'gd': return 'Scots Gaelic';
+          case 'sr': return 'Serbian';
+          case 'st': return 'Sesotho';
+          case 'sn': return 'Shona';
+          case 'sd': return 'Sindhi';
+          case 'si': return 'Sinhala';
+          case 'sk': return 'Slovak';
+          case 'sl': return 'Slovenian';
+          case 'so': return 'Somali';
+          case 'es': return 'Spanish';
+          case 'su': return 'Sundanese';
+          case 'sw': return 'Swahili';
+          case 'sv': return 'Swedish';
+          case 'tg': return 'Tajik';
+          case 'ta': return 'Tamil';
+          case 'te': return 'Telugu';
+          case 'th': return 'Thai';
+          case 'tr': return 'Turkish';
+          case 'uk': return 'Ukrainian';
+          case 'ur': return 'Urdu';
+          case 'uz': return 'Uzbek';
+          case 'vi': return 'Vietnamese';
+          case 'cy': return 'Welsh';
+          case 'xh': return 'Xhosa';
+          case 'yi': return 'Yiddish';
+          case 'yo': return 'Yoruba';
+          case 'zu': return 'Zulu';
+          } */
     }
 
     /**
@@ -605,7 +605,7 @@ class SP_Plugin {
         }
     }
 
-    function testingv1_activation() {
+    static function testingv1_activation() {
 
         global $wp_version;
         if (version_compare($wp_version, '3.5', '<')) {
@@ -628,7 +628,7 @@ class SP_Plugin {
         }
     }
 
-    function testingv1_install() {
+    static function testingv1_install() {
         include_once(LEXICON_DIR . '/install.php');
     }
 
@@ -637,52 +637,86 @@ class SP_Plugin {
                 'Lexicon', 'Lexicon', 'manage_options', 'lexicon_testing'
         );
         $hook = add_submenu_page('lexicon_testing', 'Database Management', 'Database Management', 'manage_options', 'lexicon_testing', [$this, 'plugin_settings_page']);
-        add_submenu_page('lexicon_testing', 'Import/Export', 'Import/Export', 'manage_options', 'impExp', [$this, 'testingv1_impExp_page']);
+        add_submenu_page('lexicon_testing', 'Import/Export', 'Import/Export', 'manage_options', 'lex_impExp', [$this, 'testingv1_impExp_page']);
+        add_submenu_page('lexicon_testing', 'Language Management', 'Language Management', 'manage_options', 'lex_lang_mgmt', [$this, 'testingv1_lang_mgmt_page']);
+        add_submenu_page('lexicon_testing', 'Settings', 'Settings', 'manage_options', 'lex_settings', [$this, 'testingv1_settings_page']);
         add_action("load-$hook", [$this, 'screen_option']);
+    }
+
+    public function testingv1_lang_mgmt_page() {
+        ?>
+<div class="wrap" style="">
+            <h2>Lexicon Language Management</h2>
+            <br class="clear">
+
+            <div class="postbox" style="float: left; margin-left: 20px; padding: 10px; width: 80%">
+                <h3>
+                    <span>
+                        <?php _e('Plain Language Import', 'mls_lexicon') ?>
+                    </span>
+                </h3>
+                <div style="padding:16px; border-top: 1px solid rgba(168,151,145,0.3); display: inline-block;">
+                    <form method="post" enctype="multipart/form-data" action="">
+                        <?php include_once('plainLangImport.php'); ?>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+
+    public function testingv1_settings_page() {
+        ?>
+        <div class="wrap">
+            <h2>Lexicon Settings Page</h2>
+        </div>
+        <?php
     }
 
     public function testingv1_impExp_page() {
         global $wpdb;
         ?>
-        <br class="clear">
+        <div class="wrap">
+            <h2>Lexicon Import/Export Page</h2>
+            <br class="clear">
 
-        <div class="postbox" style="float: left; margin-left: 20px; padding: 10px;">
-            <h3>
-                <span>
-                    <?php _e('Import Data', 'mls_lexicon') ?>
-                </span>
-            </h3>
-            <div style="padding:16px; border-top: 1px solid rgba(168,151,145,0.3);">
-                <form method="post" enctype="multipart/form-data" action="">
-                    <?php include_once('importFile.php'); ?>
-                </form>
+            <div class="postbox" style="float: left; margin-left: 20px; padding: 10px;">
+                <h3>
+                    <span>
+                        <?php _e('Import Data', 'mls_lexicon') ?>
+                    </span>
+                </h3>
+                <div style="padding:16px; border-top: 1px solid rgba(168,151,145,0.3);">
+                    <form method="post" enctype="multipart/form-data" action="">
+                        <?php include_once('importFile.php'); ?>
+                    </form>
+                </div>
             </div>
-        </div>
-        
-        <div class="postbox" style="float: left; margin-left: 20px; padding: 10px;">
-            <h3>
-                <span>
-                    <?php _e('Plain Import Data', 'mls_lexicon') ?>
-                </span>
-            </h3>
-            <div style="padding:16px; border-top: 1px solid rgba(168,151,145,0.3);">
-                <form method="post" enctype="multipart/form-data" action="">
-                    <?php include_once('plainLangImport.php'); ?>
-                </form>
-            </div>
-        </div>
-        
-        <div class="postbox" style="float: left; margin-left: 20px; padding: 10px;">
-            <h3>
-                <span>
-                    <?php _e('Export Data', 'mls_lexicon') ?>
-                </span>
-            </h3>
-            <div style="padding:16px; border-top: 1px solid rgba(168,151,145,0.3);">
-                <?php include_once('exportFile.php')?>
-            </div>
-        </div>
 
+            <!-- <div class="postbox" style="float: left; margin-left: 20px; padding: 10px;">
+                <h3>
+                    <span>
+                        <?php //_e('Plain Import Data', 'mls_lexicon') ?>
+                    </span>
+                </h3>
+                <div style="padding:16px; border-top: 1px solid rgba(168,151,145,0.3);">
+                    <form method="post" enctype="multipart/form-data" action="">
+                        <?php //include_once('plainLangImport.php'); ?>
+                    </form>
+                </div>
+            </div> -->
+
+            <div class="postbox" style="float: left; margin-left: 20px; padding: 10px;">
+                <h3>
+                    <span>
+                        <?php _e('Export Data', 'mls_lexicon') ?>
+                    </span>
+                </h3>
+                <div style="padding:16px; border-top: 1px solid rgba(168,151,145,0.3);">
+                    <?php include_once('exportFile.php') ?>
+                </div>
+            </div>
+        </div>
         <?php
     }
 
