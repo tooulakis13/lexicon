@@ -157,7 +157,8 @@ if (get_option("lexicon_db_version") == "") {
 					`Scope` varchar(10) NOT NULL DEFAULT '',
 					`Language_Type` varchar(10) NOT NULL DEFAULT '',		
 					`Ref_Name` varchar(50) NOT NULL DEFAULT '',
-                                        `Comment` varchar(100) NOT NULL DEFAULT ''
+                                        `Comment` varchar(100) NOT NULL DEFAULT '',
+                                        `Status` varchar(100) NOT NULL DEFAULT 'inactive'
 					) DEFAULT CHARSET=utf8; ";
     $error = false;
     $wpdb->query('START TRANSACTION');
