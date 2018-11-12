@@ -115,19 +115,19 @@ window.onload = function () {
     //document.getElementById("custom_alignleft_bulkactions_lexicon").innerHTML = classToAppendButtons;
 
     document.getElementById("lexicon-add-word").style.display = "none";
-    document.getElementById("lexicon-import-file").style.display = "none";
+    
 }
 
 function addWord() {
     document.getElementById("lexicon-table-content").style.display = "none";
     document.getElementById("lexicon-add-word").style.display = "block";
-    document.getElementById("lexicon-import-file").style.display = "none";
+    
 }
 
 function backToLexicon() {
     document.getElementById("lexicon-table-content").style.display = "block";
     document.getElementById("lexicon-add-word").style.display = "none";
-    document.getElementById("lexicon-import-file").style.display = "none";
+    
 }
 
 
