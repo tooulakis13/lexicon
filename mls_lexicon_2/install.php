@@ -7,52 +7,6 @@
 global $wpdb;
 $lexicon_db_version = "1.1";
 
-function lexicon_load_all_lang() {
-    global $wpdb;
-    $dir = str_replace("\\", "/", LEXICON_DIR) . '/lexicon_all_languages/final.csv';
-    $sqlsTemp = "";
-    //$sqls = array();
-    //load file
-    $data = file($dir);
-    //session_start();
-    //$_SESSION["giannakis"] = $data;       -->TESTING PURPOSE
-    $isFirst = true;
-    $countEntries = 0;
-    foreach ($data as $line) {
-        //Remove last CVC comma & new line
-        $lineTemp = rtrim($line);
-        $lineTempNew = rtrim($lineTemp, ",");
-        if ($isFirst) {
-            $isFirst = false;
-            continue;
-        }
-        $entry_data = explode(';', $lineTempNew);
-        //$_SESSION["giannakis"] = $entry_data;
-        $sqlsTemp .= 'INSERT INTO ' . _LEXICON_LANGUAGES . '(id, Part2B, Part2T, Part1, Scope, Language_Type, Ref_Name, Comment) values ("' . $entry_data[0] . '" , "' . $entry_data[1] . '" , "' . $entry_data[2] . '" , "' . $entry_data[3] . '", "' . $entry_data[4] . '" , "' . $entry_data[5] . '" , "' . $entry_data[6] . '" , "' . $entry_data[7] . '");';
-        $countEntries++;
-    }
-    //$_SESSION["giannakis"] = $sqlsTemp;   -->TESTING PURPOSE
-    $sqls = explode(';', $sqlsTemp);
-    $countIter = count($sqls);
-    $error = false;
-    $wpdb->query('START TRANSACTION');
-    //$_SESSION["giannakis"] = $countIter;
-    foreach ($sqls as $sqlQuery) {
-        if (--$countIter <= 0) {
-            break;
-        }
-        if (!$wpdb->query($sqlQuery)) {
-            $error = true;
-            break;
-        }
-        if ($error) {
-            $wpdb->query('ROLLBACK');
-        } else {
-            $wpdb->query('COMMIT');
-        }
-    }
-}
-
 // Check for existing DB
 if (get_option("lexicon_db_version") == "") {
     //No db found
@@ -160,6 +114,17 @@ if (get_option("lexicon_db_version") == "") {
                                         `Comment` varchar(100) NOT NULL DEFAULT '',
                                         `Status` varchar(100) NOT NULL DEFAULT 'inactive'
 					) DEFAULT CHARSET=utf8; ";
+    // lexicon_word_categories
+    $sqls[] = "CREATE TABLE `" . _LEXICON_WORD_CATEGORIES . "`(
+					`id` int unsigned NOT NULL auto_increment PRIMARY KEY,
+					`t_n` varchar(16) NOT NULL DEFAULT '',
+					`c_l` varchar(10),
+                                        `s_c` varchar(10),
+                                        `g_r` varchar(10),
+                                        `e_j` varchar(10),
+                                        `cat_eng` varchar(30) NOT NULL DEFAULT '',
+                                        `cat_esp` varchar(30) NOT NULL DEFAULT ''
+					) DEFAULT CHARSET=utf8; ";
     $error = false;
     $wpdb->query('START TRANSACTION');
     foreach ($sqls as $sql) {
@@ -173,6 +138,7 @@ if (get_option("lexicon_db_version") == "") {
     if (!$error) {
         $wpdb->query('COMMIT');
         lexicon_load_all_lang();
+        lexicon_load_word_categories();
         add_option("lexicon_db_version", $lexicon_db_version);
     } else {
         $wpdb->query('ROLLBACK');
@@ -284,6 +250,18 @@ if (get_option("lexicon_db_version") == "") {
 					MODIFY `Language_Type` varchar(10) NOT NULL DEFAULT '',		
 					MODIFY `Ref_Name` varchar(50) NOT NULL DEFAULT '',
                                         MODIFY `Comment` varchar(100) NOT NULL DEFAULT ''";
+    //lexicon_word_categories
+    $sqls[] = "ALTER TABLE `" . _LEXICON_WORD_CATEGORIES . "` DROP PRIMARY KEY";
+    $sqls[] = "ALTER TABLE `" . _LEXICON_WORD_CATEGORIES . "` 
+                                        MODIFY `id` int unsigned NOT NULL auto_increment,
+					MODIFY `t_n` varchar(16) NOT NULL DEFAULT '',
+					MODIFY `c_l` varchar(10),
+                                        MODIFY `s_c` varchar(10),
+                                        MODIFY `g_r` varchar(10),
+                                        MODIFY `e_j` varchar(10),
+                                        MODIFY `cat_eng` varchar(30) NOT NULL DEFAULT '',
+                                        MODIFY `cat_esp` varchar(30) NOT NULL DEFAULT '',
+                                        ADD PRIMARY KEY (id)";
     //$sqls[] = "SET foreign_key_checks = 1";
 
     $error = false;

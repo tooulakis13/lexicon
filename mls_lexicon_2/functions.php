@@ -2,6 +2,21 @@
 
 global $wpdb;
 
+//* Add filter to check filetype and extension
+add_filter('wp_check_filetype_and_ext', 'testingv1_check_filetype_and_ext', 10, 4);
+
+// If the current user can upload_csv and the file extension is csv, override arguments - edit - "$pathinfo" changed to "pathinfo"
+function testingv1_check_filetype_and_ext($args, $file, $filename, $mimes) {
+    if (current_user_can('upload_csv') && 'csv' === pathinfo($filename)['extension']) {
+        $args = array(
+            'ext' => 'csv',
+            'type' => 'text/csv',
+            'proper_filename' => $filename,
+        );
+    }
+    return $args;
+}
+
 function lexicon_word_coexist() {
     global $wpdb;
     $allWords = $wpdb->get_results('SELECT * FROM ' . _LEXICON_WORD_DETAILS . '');
@@ -25,10 +40,10 @@ function lexicon_word_coexist() {
                 break;
             }
             $independentValues = explode(',', $lang);
-            if ($independentValues[3] === "true"){
-              $specialWord[] = $independentValues[0];
-            }else if ($independentValues[3] === "false"){
-              continue;
+            if ($independentValues[3] === "true") {
+                $specialWord[] = $independentValues[0];
+            } else if ($independentValues[3] === "false") {
+                continue;
             }
         }
         //var_dump($specialWord);
@@ -57,12 +72,12 @@ function lexicon_word_coexist() {
                 }
                 $newValues .= $newIndependentValues;
             }
-            if(is_null($specialWord)){
+            if (is_null($specialWord)) {
                 $finalValues = $activeLangWordId . "," . $newValues . "false";
             } else {
-                if(in_array($activeLangWordId, $specialWord)) {
+                if (in_array($activeLangWordId, $specialWord)) {
                     $finalValues = $activeLangWordId . "," . $newValues . "true";
-                }else {
+                } else {
                     $finalValues = $activeLangWordId . "," . $newValues . "false";
                 }
             }
@@ -101,7 +116,6 @@ function testingv1_assign_nums($type = "all") {
         case "fuzzy":
             return "2,";
     }
-
 }
 
 function lexicon_load($dir, $type, $cols_to_add) {
@@ -116,6 +130,9 @@ function lexicon_load($dir, $type, $cols_to_add) {
                     break;
                 case 'course':
                     $x = lexicon_load_course($dir, $archive);
+                    break;
+                case 'catLoad':
+                    $x = lexicon_load_word_categories($dir, $archive, $cols_to_add);
                     break;
                 default:
             }
@@ -147,16 +164,22 @@ function lexicon_load_lang($dir, $lang_name, $cols_to_add) {
     global $wpdb;
     $databaseName = $wpdb->dbname;
     $absolutepath = $dir . $lang_name;
-    echo $absolutepath;
+    //echo $absolutepath;
     $sqlsTemp = "";
+    //echo '<script type="text/javascript">alert("IN LOAD LANG FUNCTION");</script>';
     //$sqls = array();
     //load file
     $data = file($absolutepath);
     $isFirst = true;
-    $cols_to_add_word = $cols_to_add . '_word';
-    $cols_to_add_phrase = $cols_to_add . '_phrase';
-    $languageExistCheck = $wpdb->get_results("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='$databaseName' AND TABLE_NAME='" . _LEXICON_WORD_DETAILS . "' and (column_name='$cols_to_add_word' or column_name='$cols_to_add_phrase');");
-    lexicon_add_language($cols_to_add);
+    //$cols_to_add_word = $cols_to_add . '_word';
+    //$cols_to_add_phrase = $cols_to_add . '_phrase';
+    //$languageExistCheck = $wpdb->get_results("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='$databaseName' AND TABLE_NAME='" . _LEXICON_WORD_DETAILS . "' and (column_name='$cols_to_add_word' or column_name='$cols_to_add_phrase');");
+    $tempValStore = lexicon_add_language_inDB($cols_to_add, "yes");
+
+    $cols_to_add_word = $tempValStore[0];
+    $cols_to_add_phrase = $tempValStore[1];
+    $languageExistCheck = $tempValStore[2];
+
     //echo print_r($languageExistCheck);
     foreach ($data as $line) {
         //Remove last CVC comma & new line
@@ -267,7 +290,178 @@ function lexicon_load_lang($dir, $lang_name, $cols_to_add) {
     unlink(LEXICON_FILE_TO_REMOVE);
 }
 
-function lexicon_add_language($cols_to_add) {
+/*
+  function lexicon_load_auto_categories() {
+  global $wpdb;
+  $dir = str_replace("\\", "/", LEXICON_DIR) . '/lexicon_all_languages/cod-cat-final.csv';
+  $sqlsTemp = "";
+  //$sqls = array();
+  //load file
+  $data = file($dir);
+  //session_start();
+  //$_SESSION["giannakis"] = $data;       -->TESTING PURPOSE
+  $isFirst = true;
+  foreach ($data as $line) {
+  //Remove last CVC comma & new line
+  $lineTemp = rtrim($line);
+  $lineTempNew = rtrim($lineTemp, ",");
+  if ($isFirst) {
+  $isFirst = false;
+  continue;
+  }
+  $entry_data = explode(';', $lineTempNew);
+  //$_SESSION["giannakis"] = $entry_data;
+
+  if ($entry_data[0] == "1") {
+  $entry_data[0] = "N.G.";
+  } else if ($entry_data[0] == "2") {
+  $entry_data[0] = "N.E.";
+  }
+
+  $entry_data[1] = lexiconSingleBit2Two($entry_data[1]);
+  $entry_data[2] = lexiconSingleBit2Two($entry_data[2]);
+  $entry_data[3] = lexiconSingleBit2Two($entry_data[3]);
+  $entry_data[4] = lexiconSingleBit2Two($entry_data[4]);
+
+  $sqlsTemp .= 'INSERT INTO ' . _LEXICON_WORD_CATEGORIES . '(t_n, c_l, s_c, g_r, e_j, cat_eng, cat_esp) values ("' . $entry_data[0] . '" , "' . $entry_data[1] . '" , "' . $entry_data[2] . '" , "' . $entry_data[3] . '", "' . $entry_data[4] . '" , "' . ucfirst(mb_strtolower($entry_data[6])) . '" , "' . ucfirst(mb_strtolower($entry_data[5])) . '");';
+  }
+  //$_SESSION["giannakis"] = $sqlsTemp;   -->TESTING PURPOSE
+  $sqls = explode(';', $sqlsTemp);
+  $countIter = count($sqls);
+  $error = false;
+  $wpdb->query('START TRANSACTION');
+  //$_SESSION["giannakis"] = $countIter;
+  foreach ($sqls as $sqlQuery) {
+  if (--$countIter <= 0) {
+  break;
+  }
+  if (!$wpdb->query($sqlQuery)) {
+  $error = true;
+  break;
+  }
+  if ($error) {
+  $wpdb->query('ROLLBACK');
+  } else {
+  $wpdb->query('COMMIT');
+  }
+  }
+  }
+ */
+
+function lexicon_load_word_categories($dir = "empty", $lang_name = "empty", $cols_to_add = "none") {
+    global $wpdb;
+    $databaseName = $wpdb->dbname;
+
+    $result = $wpdb->get_results('SELECT * FROM ' . _LEXICON_WORD_CATEGORIES . ' WHERE id IS NOT NULL');
+    //write_log(count($result));
+    //session_start();
+    //$_SESSION["otinane"] = count($result);
+
+    if (count($result) == 0) {
+        $absolutepath = str_replace("\\", "/", LEXICON_DIR) . '/lexicon_all_languages/cod-cat-final.csv';
+        $finishingTouch = false;
+    } else if (count($result) > 0) {
+        $finishingTouch = true;
+        $absolutepath = $dir . $lang_name;
+        $tempValStore = lexicon_add_wordCats_inDB($cols_to_add, "yes");
+        $cols_to_add_cat = $tempValStore[0];
+        $languageExistCheck = $tempValStore[1];
+    }
+
+    //echo $absolutepath;
+    $sqlsTemp = "";
+    //$sqls = array();
+    //load file
+    $data = file($absolutepath);
+    $isFirst = true;
+    $isSecond = true;
+    //$cols_to_add_cat = 'cat_' . $cols_to_add;
+    //$languageExistCheck = $wpdb->get_results("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='$databaseName' AND TABLE_NAME='" . _LEXICON_WORD_DETAILS . "' and (column_name='$cols_to_add_cat');");
+    //echo print_r($languageExistCheck);
+    foreach ($data as $line) {
+        //Remove last CVC comma & new line
+        $lineTemp = rtrim($line);
+        $lineTempNew = rtrim($lineTemp, ",");
+        if ($isFirst) {
+            $isFirst = false;
+            continue;
+        }
+        if ($isSecond) {
+            $isSecond = false;
+            continue;
+        }
+        $entry_data = explode(';', $lineTempNew);
+
+        if ($entry_data[0] == "1") {
+            $entry_data[0] = "N.G.";
+        } else if ($entry_data[0] == "2") {
+            $entry_data[0] = "N.E.";
+        }
+
+        $entry_data[1] = lexiconSingleBit2Two($entry_data[1]);
+        $entry_data[2] = lexiconSingleBit2Two($entry_data[2]);
+        $entry_data[3] = lexiconSingleBit2Two($entry_data[3]);
+        $entry_data[4] = lexiconSingleBit2Two($entry_data[4]);
+        $entry_data[5] = sanitize_text_field($entry_data[5]);
+        $entry_data[5] = ucfirst(mb_strtolower($entry_data[5]));
+
+        //$result = $wpdb->get_results('SELECT * FROM ' . _LEXICON_WORD_CATEGORIES . ' WHERE id IS NOT NULL');
+
+        $checkIdExist = $wpdb->get_results('SELECT * FROM ' . _LEXICON_WORD_CATEGORIES . ' WHERE t_n = "' . $entry_data[0] . '" AND c_l = "' . $entry_data[1] . '" AND s_c = "' . $entry_data[2] . '" AND g_r = "' . $entry_data[3] . '" AND e_j = "' . $entry_data[4] . '";');
+        //write_log(print_r($checkIdExist, true));
+        if ($finishingTouch == FALSE) {
+            //>>>QUERY USED FOR THE FIRST IMPORTED FILE<<<
+            $entry_data[6] = sanitize_text_field($entry_data[6]);
+            $entry_data[6] = ucfirst(mb_strtolower($entry_data[6]));
+            $sqlsTemp .= 'INSERT INTO ' . _LEXICON_WORD_CATEGORIES . ' (t_n, c_l, s_c, g_r, e_j, cat_eng, cat_esp) values ("' . $entry_data[0] . '" , "' . $entry_data[1] . '" , "' . $entry_data[2] . '" , "' . $entry_data[3] . '", "' . $entry_data[4] . '" , "' . $entry_data[6] . '" , "' . $entry_data[5] . '");';
+        } else if ($finishingTouch == TRUE && count($checkIdExist) == 1) {
+            //>>>QUERY USED FOR THE REST OF THE FILES IN CASE THERE ARE NO NEW WORDS IN THE CSV FILE
+            $sqlsTemp .= 'UPDATE ' . _LEXICON_WORD_CATEGORIES . ' SET ' . $cols_to_add_cat . ' = "' . $entry_data[5] . '" WHERE t_n = "' . $entry_data[0] . '" AND c_l = ' . $entry_data[1] . ' AND s_c = ' . $entry_data[2] . ' AND g_r = ' . $entry_data[3] . ' AND e_j = ' . $entry_data[4] . ';';
+        } else if ($finishingTouch == TRUE && count($checkIdExist) == 0) {
+            //>>>QUERY USED FOR THE REST OF THE FILES IN CASE THERE ARE NEW WORDS IN THE CSV FILE<<<
+            $sqlsTemp .= 'INSERT INTO ' . _LEXICON_WORD_CATEGORIES . ' (t_n, c_l, s_c, g_r, e_j, ' . $cols_to_add_cat . ') values ("' . $entry_data[0] . '" , "' . $entry_data[1] . '" , "' . $entry_data[2] . '" , "' . $entry_data[3] . '", "' . $entry_data[4] . '" , "' . $entry_data[5] . '");';
+        }
+    }
+    
+    /*write_log(print_r($sqlsTemp, true));
+    */
+    /*if ($finishingTouch == FALSE) {
+        write_log("false");
+    }else if ($finishingTouch == TRUE){
+        write_log("TRUE");
+    }*/
+    //echo $sqlsTemp;
+    $sqls = explode(';', $sqlsTemp);
+    $countIter = count($sqls);
+    $error = false;
+    //write_log($countIter);
+    //write_log($sqlsTemp);
+    $wpdb->query('START TRANSACTION');
+    foreach ($sqls as $sqlQuery) {
+        if (--$countIter <= 0) {
+            break;
+        }
+        if (!$wpdb->query($sqlQuery)) {
+            $error = true;
+            break;
+        }
+        if ($error) {
+            //write_log($error);
+            $wpdb->query('ROLLBACK');
+        } else {
+            //write_log($sqlQuery);
+            $wpdb->query('COMMIT');
+        }
+    }
+    
+
+    if ($finishingTouch == TRUE) {
+        echo '<script type="text/javascript">alert("Your file was succesfully uploaded");</script>';
+        unlink(LEXICON_FILE_TO_REMOVE);
+    }
+}
+
+function lexicon_add_language_inDB($cols_to_add, $sendBack = "no") {
 
     global $wpdb;
 
@@ -309,4 +503,111 @@ function lexicon_add_language($cols_to_add) {
             }
         }
     }
+
+    if ($sendBack === "yes") {
+        return array($cols_to_add_word, $cols_to_add_phrase, $checkColExist);
+    }
+}
+
+function lexicon_add_wordCats_inDB($cols_to_add, $sendBack = "no") { //NEEDS FULL MODIFICATION
+    global $wpdb;
+
+    $cols_to_add_cats = 'cat_' . $cols_to_add;
+
+    echo '<br/>';
+    //echo $LEXICON_LANGUAGES_FOR_GET_COLUMNS;
+    echo '<br/>';
+    //echo $LEXICON_LANGUAGES_FOR_COLUMN_DEFAULT;
+    echo '<br/>';
+
+    $databaseName = $wpdb->dbname;
+    $checkColExist = $wpdb->get_results("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='$databaseName' AND TABLE_NAME='" . _LEXICON_WORD_CATEGORIES . "' and column_name='$cols_to_add_cats';");
+
+    //echo print_r($result);
+
+    if (!$checkColExist) {
+        $add_cols_query = 'ALTER TABLE ' . _LEXICON_WORD_CATEGORIES . ' ADD ' . $cols_to_add_cats . ' varchar(30) NOT NULL DEFAULT "";';
+
+        //echo $add_cols_query;
+        $sqls = explode(';', $add_cols_query);
+        $countIter = count($sqls);
+        $error = false;
+        $wpdb->query('START TRANSACTION');
+        foreach ($sqls as $sqlQuery) {
+            if (--$countIter <= 0) {
+                break;
+            }
+            if (!$wpdb->query($sqlQuery)) {
+                $error = true;
+                break;
+            }
+            if ($error) {
+                $wpdb->query('ROLLBACK');
+            } else {
+                $wpdb->query('COMMIT');
+            }
+        }
+    }
+
+    if ($sendBack === "yes") {
+        return array($cols_to_add_cats, $checkColExist);
+    }
+}
+
+function lexicon_load_all_lang() {
+    global $wpdb;
+    $dir = str_replace("\\", "/", LEXICON_DIR) . '/lexicon_all_languages/lexicon_all_lang.csv';
+    $sqlsTemp = "";
+    //$sqls = array();
+    //load file
+    $data = file($dir);
+    //session_start();
+    //$_SESSION["giannakis"] = $data;       -->TESTING PURPOSE
+    $isFirst = true;
+    //$countEntries = 0;
+    foreach ($data as $line) {
+        //Remove last CVC comma & new line
+        $lineTemp = rtrim($line);
+        $lineTempNew = rtrim($lineTemp, ",");
+        if ($isFirst) {
+            $isFirst = false;
+            continue;
+        }
+        $entry_data = explode(';', $lineTempNew);
+        //$_SESSION["giannakis"] = $entry_data;
+        $sqlsTemp .= 'INSERT INTO ' . _LEXICON_LANGUAGES . '(id, Part2B, Part2T, Part1, Scope, Language_Type, Ref_Name, Comment) values ("' . $entry_data[0] . '" , "' . $entry_data[1] . '" , "' . $entry_data[2] . '" , "' . $entry_data[3] . '", "' . $entry_data[4] . '" , "' . $entry_data[5] . '" , "' . $entry_data[6] . '" , "' . $entry_data[7] . '");';
+        //$countEntries++;
+    }
+    //$_SESSION["giannakis"] = $sqlsTemp;   -->TESTING PURPOSE
+    $sqls = explode(';', $sqlsTemp);
+    $countIter = count($sqls);
+    $error = false;
+    $wpdb->query('START TRANSACTION');
+    //$_SESSION["giannakis"] = $countIter;
+    foreach ($sqls as $sqlQuery) {
+        if (--$countIter <= 0) {
+            break;
+        }
+        if (!$wpdb->query($sqlQuery)) {
+            $error = true;
+            break;
+        }
+        if ($error) {
+            $wpdb->query('ROLLBACK');
+        } else {
+            $wpdb->query('COMMIT');
+        }
+    }
+}
+
+if (!function_exists('write_log')) {
+	function write_log ( $log )  {
+		if ( true === WP_DEBUG ) {
+			if ( is_array( $log ) || is_object( $log ) ) {
+				error_log( print_r( $log, true ) );
+			} else {
+				error_log( $log );
+			}
+		}
+	}
 }

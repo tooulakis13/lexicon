@@ -1,7 +1,7 @@
 <?php
 $kv_errors = array();
 
-if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form']) && isset($_POST['lex_lang'])) {
+if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form_lang']) && isset($_POST['lex_lang'])) {
 
     /* $fields = array(
       'kv_name',
@@ -45,6 +45,49 @@ if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form']) && isse
         $upload_overrides = array('test_form' => false);
 
         $movefile = wp_handle_upload($uploadedfile, $upload_overrides);
+        //print_r($movefile);
+        $new_filename = basename($movefile['url']);
+        
+        $lex_tempfile_url = $movefile['url'];
+        $lex_tempfile_name_length = strlen($_FILES['lexicon_file_to_upload']['name']);
+
+        if ($movefile && !isset($movefile['error'])) {
+
+            //echo '<script type="text/javascript">alert("' . $movefile['url'] . '");</script>';
+            $dir = LEXICON_UPLOAD_DIR;
+            //echo LEXICON_UPLOAD_DIR;
+            $lex_temp_file_loc = strstr($lex_tempfile_url, LEXICON_UPLOAD_DIR_NAME);
+            //print_r($lex_temp_file_loc);
+            $dir = LEXICON_UPLOAD_DIR . $lex_temp_file_loc;
+            $new_dir = str_replace('/', "\\", $dir);
+            define('LEXICON_FILE_TO_REMOVE', $new_dir);
+            $direc = substr($new_dir, 0, -$lex_tempfile_name_length);
+            //echo $direc;
+
+            lexicon_load($direc, 'lang', $new_cols_name);
+            wp_redirect(esc_url_raw(add_query_arg(array('page' => 'lexicon_testing'), admin_url('admin.php'))));
+        } else {
+            echo '<script type="text/javascript">alert("Your file was not succesfully uploaded");</script>';
+            wp_redirect(esc_url_raw(add_query_arg(array('page' => 'lexicon_testing'), admin_url('admin.php'))));
+        }
+    }
+} else if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form_cat']) && isset($_POST['lex_lang'])) {
+
+    if (!empty($_FILES['lexicon_file_to_upload'])) {
+
+        if (!function_exists('wp_handle_upload')) {
+            require_once( ABSPATH . 'wp-admin/includes/file.php' );
+        }
+
+        $new_cols_name = $_POST['lex_lang'];
+
+        //testingv1_get_word_details_cols();
+
+        $uploadedfile = $_FILES['lexicon_file_to_upload'];
+
+        $upload_overrides = array('test_form' => false);
+
+        $movefile = wp_handle_upload($uploadedfile, $upload_overrides);
         $new_filename = basename($movefile['url']);
         $lex_tempfile_url = $movefile['url'];
         $lex_tempfile_name_length = strlen($_FILES['lexicon_file_to_upload']['name']);
@@ -62,7 +105,7 @@ if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form']) && isse
             $direc = substr($new_dir, 0, -$lex_tempfile_name_length);
             //echo $direc;
 
-            lexicon_load($direc, 'lang', $new_cols_name);
+            lexicon_load($direc, 'catLoad', $new_cols_name);
             wp_redirect(esc_url_raw(add_query_arg(array('page' => 'lexicon_testing'), admin_url('admin.php'))));
         } else {
             echo '<script type="text/javascript">alert("Your file was not succesfully uploaded");</script>';
@@ -89,7 +132,17 @@ if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form']) && isse
     ?>
     <input type="hidden" value="<?php echo $moreLanguagesOption ?>" id="moreOpt"/>
     <input type="hidden" value="<?php echo $lessLanguagesOption ?>" id="lessOpt"/>
-    <section id="sectionImportLang">
+    
+    <div id="importOptions">
+        <p class="impOpts">
+            <label id="impOptsSelLang" class="impOptsSel" onclick="showSelectedImpOpt('language')">Language</label>
+            /
+            <label id="impOptsSelCourse" class="impOptsUnSel" onclick="showSelectedImpOpt('course')">Course</label>
+            /
+            <label id="impOptsSelCat" class="impOptsUnSel" onclick="showSelectedImpOpt('categories')">Categories</label></p>
+    </div>
+    
+    <section id="sectionImportLang" class="impOptsShow">
         <label>Language: </label>
         <?php //echo var_dump($lessLanguagesOption); ?>
         <select name="lex_lang" id="theLanguagesOptions">
@@ -110,7 +163,7 @@ if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form']) && isse
 
         <br/> <br/>
 
-        <input id="submit" class="button-primary" name="submit_form" type="submit" value="Submit">
+        <input id="submit" class="button-primary" name="submit_form_lang" type="submit" value="Submit">
     </section>
 
     <?php

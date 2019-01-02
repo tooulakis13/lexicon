@@ -6,6 +6,7 @@
  */
 //session_start();              
 //echo $_SESSION["giannakis"];  -->TESTING PURPOSE
+//echo $_SESSION["otinane"];
 global $wpdb;
 //console.log(var_dump($_SESSION["giannakis"]));
 $uploads = wp_upload_dir();
@@ -26,11 +27,10 @@ define('_LEXICON_WORDS', $wpdb->prefix . 'lexicon_words');
 define('_LEXICON_WORD_CODE', $wpdb->prefix . 'lexicon_word_code');
 define('_LEXICON_WORD_DETAILS', $wpdb->prefix . 'lexicon_word_details');
 define('_LEXICON_LANGUAGES', $wpdb->prefix . 'lexicon_languages');
+define('_LEXICON_WORD_CATEGORIES', $wpdb->prefix . 'lexicon_word_categories');
 
 //Links to necessary files
-require_once(LEXICON_DIR . '/includes/lexicon_functions.php');
 require_once(LEXICON_DIR . '/functions.php');
-require_once(LEXICON_DIR . '/includes/lexicon_ajax.php');
 
 if (!class_exists('WP_List_Table')) {
     require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
@@ -224,6 +224,10 @@ class Lexicon_words_List extends WP_List_Table {
      * @return string
      */
     function column_code($item) {
+
+        //----> FIRST OF ALL, IMPLEMENT THE FUNCTION <-----
+        //----> CALL A FUNCTION HERE TO GET THE DATA FROM SERVER FOR THE QUICK EDIT <-----
+
         $delete_nonce = wp_create_nonce('sp_delete_lexicon_word');
         $columnContainsWordCode = 'row-' . $item['id'] . '-contains-code';
         $title = '<strong id="' . $columnContainsWordCode . '">' . $item['code'] . '</strong>';
@@ -516,6 +520,10 @@ class SP_Plugin {
             load_plugin_textdomain('testingv1', false, basename(LEXICON_DIR) . '/lang/');
             testingv1_create_page_test();
         }
+
+        //CSV FILES ALLOWED IF ADMIN
+        $admin = get_role('administrator');
+        $admin->add_cap('upload_csv');
     }
 
     static function testingv1_deactivation() {
@@ -526,6 +534,10 @@ class SP_Plugin {
             define('TESTINGV1_PSEUDO_UNINSTALL', true);
             include_once(LEXICON_DIR . '/uninstall.php');
         }
+
+        //REMOVE CSV ALLOWANCE
+        $admin = get_role('administrator');
+        $admin->remove_cap('upload_csv');
     }
 
     static function testingv1_install() {
@@ -605,6 +617,8 @@ class SP_Plugin {
                 </h3>
                 <div style="padding:16px; border-top: 1px solid rgba(168,151,145,0.3);">
                     <?php include_once('exportFile.php') ?>
+                    <br/><br/><br/>
+                    <a href="<?php get_permalink(); ?> \wordpress\wp-content\plugins\testingv1\lexicon_all_languages\languageFileExample.csv" download>Download file structure example!</a>
                 </div>
             </div>
         </div>
@@ -631,9 +645,9 @@ class SP_Plugin {
                                     ?>
                                 </div>
                             </form>
-                            <div id="lexicon-add-word">
+                            <!-- <div id="lexicon-add-word">
                                 <input type="button" onclick="backToLexicon()" class="button-secondary" value="Cancel"/>
-                            </div>
+                            </div> -->
 
 
                         </div>
