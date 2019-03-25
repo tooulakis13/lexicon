@@ -38,7 +38,7 @@ if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form_lang']) &&
 
         $new_cols_name = $_POST['lex_lang'];
 
-        //testingv1_get_word_details_cols();
+        //lexicon_get_word_details_cols();
 
         $uploadedfile = $_FILES['lexicon_file_to_upload'];
 
@@ -59,20 +59,22 @@ if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form_lang']) &&
             $lex_temp_file_loc = strstr($lex_tempfile_url, LEXICON_UPLOAD_DIR_NAME);
             //print_r($lex_temp_file_loc);
             $dir = LEXICON_UPLOAD_DIR . $lex_temp_file_loc;
-            $new_dir = str_replace('/', "\\", $dir);
+            //$new_dir = str_replace('/', "\\", $dir);
+			$new_dir = $dir;
             define('LEXICON_FILE_TO_REMOVE', $new_dir);
             $direc = substr($new_dir, 0, -$lex_tempfile_name_length);
             //echo $direc;
 
             lexicon_load($direc, 'lang', $new_cols_name);
-            wp_redirect(esc_url_raw(add_query_arg(array('page' => 'lexicon_testing'), admin_url('admin.php'))));
+            wp_redirect(esc_url_raw(add_query_arg(array('page' => 'lex_impExp'), admin_url('admin.php'))));
+			exit();
         } else {
             echo '<script type="text/javascript">alert("Your file was not succesfully uploaded");</script>';
             wp_redirect(esc_url_raw(add_query_arg(array('page' => 'lexicon_testing'), admin_url('admin.php'))));
+			exit();
         }
     }
 } else if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form_cat']) && isset($_POST['lex_lang'])) {
-
     if (!empty($_FILES['lexicon_file_to_upload'])) {
 
         if (!function_exists('wp_handle_upload')) {
@@ -81,7 +83,7 @@ if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form_lang']) &&
 
         $new_cols_name = $_POST['lex_lang'];
 
-        //testingv1_get_word_details_cols();
+        //lexicon_get_word_details_cols();
 
         $uploadedfile = $_FILES['lexicon_file_to_upload'];
 
@@ -93,27 +95,28 @@ if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['submit_form_lang']) &&
         $lex_tempfile_name_length = strlen($_FILES['lexicon_file_to_upload']['name']);
 
         if ($movefile && !isset($movefile['error'])) {
-
             //echo '<script type="text/javascript">alert("' . $movefile['url'] . '");</script>';
             $dir = LEXICON_UPLOAD_DIR;
             //echo LEXICON_UPLOAD_DIR;
             $lex_temp_file_loc = strstr($lex_tempfile_url, LEXICON_UPLOAD_DIR_NAME);
             //echo $lex_temp_file_loc;
             $dir = LEXICON_UPLOAD_DIR . $lex_temp_file_loc;
-            $new_dir = str_replace('/', "\\", $dir);
+            //$new_dir = str_replace('/', "\\", $dir);
+			$new_dir = $dir;
             define('LEXICON_FILE_TO_REMOVE', $new_dir);
             $direc = substr($new_dir, 0, -$lex_tempfile_name_length);
             //echo $direc;
 
             lexicon_load($direc, 'catLoad', $new_cols_name);
-            wp_redirect(esc_url_raw(add_query_arg(array('page' => 'lexicon_testing'), admin_url('admin.php'))));
+            wp_redirect(esc_url_raw(add_query_arg(array('page' => 'lex_impExp'), admin_url('admin.php'))));
+			exit();
         } else {
             echo '<script type="text/javascript">alert("Your file was not succesfully uploaded");</script>';
             wp_redirect(esc_url_raw(add_query_arg(array('page' => 'lexicon_testing'), admin_url('admin.php'))));
+			exit();
         }
     }
 } else {
-
     $twoLetterLivingLanguages = $wpdb->get_results("SELECT * FROM " . _LEXICON_LANGUAGES . " WHERE Part1 <> '' AND Language_Type = 'L';");
     //print_r($twoLetterLivingLanguages);
     $smallLangList = ['es', 'cs', 'da', 'de', 'et', 'el', 'en', 'fr', 'ga', 'hr', 'it', 'lv', 'lt', 'hu', 'mt', 'nl', 'pl', 'pt', 'ro', 'sk', 'sl', 'fi', 'sv'];

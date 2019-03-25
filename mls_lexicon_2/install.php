@@ -86,7 +86,7 @@ if (get_option("lexicon_db_version") == "") {
                                 `code` varchar(16) NOT NULL DEFAULT '',
   			        `level` varchar(10) NOT NULL DEFAULT '',
                                 `t_n` varchar(16) NOT NULL DEFAULT '',
-                                `word_coexist` varchar(80) NOT NULL DEFAULT ''
+                                `word_coexist` varchar(800) NOT NULL DEFAULT ''
 					) DEFAULT CHARSET=utf8; ";
     // lexicon_word_details
     $sqls[] = "CREATE TABLE `" . _LEXICON_WORD_DETAILS . "`(
@@ -299,19 +299,22 @@ if (get_page_by_title('LEXICON') == null) {
  * 	Lexicon Options
  */
 
-if (get_option("testingv1_install") == "") {
-    add_option("testingv1_install", '1');
+if (get_option("lexicon_install") == "") {
+    add_option("lexicon_install", '1');
 } else {
-    update_option("testingv1_install", '1');
+    update_option("lexicon_install", '1');
 }
-if (get_option("testingv1_clear_data_deactive") == "") {
-    add_option("testingv1_clear_data_deactive", '1');
+if (get_option("lexicon_clear_data_deactive") == "") {
+    add_option("lexicon_clear_data_deactive", '1');
 } else {
-    update_option("testingv1_clear_data_deactive", '1');
+    update_option("lexicon_clear_data_deactive", '1');
 }
-if (get_option("testingv1_cleanup_db") == "") {
-    add_option("testingv1_cleanup_db", '1');
+if (get_option("lexicon_cleanup_db") == "") {
+    add_option("lexicon_cleanup_db", '1');
 } else {
-    update_option("testingv1_cleanup_db", '1');
+    update_option("lexicon_cleanup_db", '1');
 }
+
+$lex_userId = get_current_user_id();
+add_user_meta($lex_userId, "primaryLang", "eng");
 ?>

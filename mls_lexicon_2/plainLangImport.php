@@ -1,15 +1,14 @@
 <?php
 global $wpdb;
-
 ?>
 
 <br />
 
 <?php
 if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['formSubmit'])) {
-    if(isset($_POST['language'])){
+    if (isset($_POST['language'])) {
         $lexicon_lang = $_POST['language'];
-    }else{
+    } else {
         $lexicon_lang = "";
     }
     if (empty($lexicon_lang)) {
@@ -19,8 +18,8 @@ if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['formSubmit'])) {
 
         //echo("You selected $N language(s): ");
         //var_dump($lexicon_lang);
-        foreach ($lexicon_lang as $langToAdd){
-            lexicon_add_language($langToAdd);
+        foreach ($lexicon_lang as $langToAdd) {
+            lexicon_add_language_inDB($langToAdd, "no");
         }
         echo "All $N languages created successfully!";
         wp_redirect(esc_url_raw(add_query_arg(array('page' => 'lexicon_testing'), admin_url('admin.php'))));
@@ -34,10 +33,16 @@ if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['formSubmit'])) {
         foreach ($allLanguages as $language) {
             $languageId = $language->id;
             $languageRefName = $language->Ref_Name;
+            $langRefNameBrackCheck = strpos($languageRefName, "(");
+            if (!$langRefNameBrackCheck) {
+                $langRefName = $languageRefName;
+            } else {
+                $langRefName = substr($languageRefName, 0, strpos($languageRefName, "(") - 1);
+            }
             if ($counter <= 5) {
                 ?>
                 <td><input type="checkbox" name="language[]" value="<?php echo $languageId ?>" /></td>
-                <td><span style=";width: 120px;"><?php echo $languageRefName ?></span></td>
+                <td><span style=";width: 120px;"><?php echo $langRefName ?></span></td>
 
 
                 <?php
@@ -54,8 +59,11 @@ if ('POST' == $_SERVER['REQUEST_METHOD'] && isset($_POST['formSubmit'])) {
     </table>
     <br/>
     <br/>
-    <input class="button-primary" type="submit" name="formSubmit" value="Submit" />
-
+    <div style="display: flex">
+        <input class="button-primary" type="submit" onclick="applyLoader()" name="formSubmit" value="Submit" />
+        <span style="width: 10px"></span>
+        <div id="updateLoader" class="loader"></div>
+    </div>
 
     <?php
 }

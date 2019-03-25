@@ -25,7 +25,7 @@ $checkFirst = 0;
 
     $word_details_cols = $wpdb->get_results("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS "
             . "WHERE TABLE_SCHEMA='$databaseName' "
-            . "AND TABLE_NAME='" . _LEXICON_WORD_DETAILS . "' OR TABLE_NAME='" . _LEXICON_WORD_CODE . "';");
+            . "AND (TABLE_NAME='" . _LEXICON_WORD_DETAILS . "' OR TABLE_NAME='" . _LEXICON_WORD_CODE . "') AND (COLUMN_NAME NOT IN ('code_id', 'code'));");
     
     for ($counter = 0; $counter <= (count($result) - 1); $counter++) {
         $res = $result[$counter];

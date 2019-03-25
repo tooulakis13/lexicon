@@ -5,7 +5,7 @@
   Description: Eliminación del plugin lexicon.
 */
 
-if(defined('WP_UNINSTALL_PLUGIN') or defined('TESTINGV1_PSEUDO_UNINSTALL')) {
+if(defined('WP_UNINSTALL_PLUGIN') or defined('lexicon_PSEUDO_UNINSTALL')) {
   
 } else {
 	exit();
@@ -13,7 +13,7 @@ if(defined('WP_UNINSTALL_PLUGIN') or defined('TESTINGV1_PSEUDO_UNINSTALL')) {
 global $wpdb;
 
 //  If clean lexicon data is selected in admin panel, clear DB
-if(get_option('testingv1_cleanup_db') == 1)
+if(get_option('lexicon_cleanup_db') == 1)
 {
   // Tables to be removed
   $wpdb->query("SET FOREIGN_KEY_CHECKS=0;");
@@ -27,7 +27,8 @@ if(get_option('testingv1_cleanup_db') == 1)
   $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}lexicon_word_code");
   $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}lexicon_word_details");
   $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}lexicon_languages");
-   $wpdb->query("SET FOREIGN_KEY_CHECKS=1;");
+  $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}lexicon_word_categories");
+  $wpdb->query("SET FOREIGN_KEY_CHECKS=1;");
 
   //Lexicon page is deleted
   $wpdb->query("DELETE FROM {$wpdb->prefix}posts WHERE post_name = 'lexicon'");
@@ -47,6 +48,9 @@ if(get_option('testingv1_cleanup_db') == 1)
   
   //Removing user meta
   delete_metadata( 'user', 0, 'lexicon_custom_list_pages', '', true);
+  delete_user_meta(get_current_user_id(), 'primaryLang');
+  delete_user_meta(get_current_user_id(), 'secondaryLang');
+  delete_user_meta(get_current_user_id(), 'additionalLang');
   
   
   // Capabilities removal
